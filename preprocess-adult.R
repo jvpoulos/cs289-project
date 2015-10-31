@@ -1,18 +1,17 @@
 # Prepare adult dataset
-# Uses code from http://scg.sdsu.edu/dataset-adult_r/
 
 # Load data from UCI repository
 adult.train <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
-                          sep=",",header=F,col.names=c("age", "type_employer", "fnlwgt", "education", 
-                                                       "education_num","marital", "occupation", "relationship", "race","sex",
-                                                       "capital_gain", "capital_loss", "hr_per_week","country", "income"),
+                          sep=",",header=F,col.names=c("age", "type.employer", "fnlwgt", "education", 
+                                                       "education.num","marital", "occupation", "relationship", "race","sex",
+                                                       "capital.gain", "capital.loss", "hr.per.week","country", "income"),
                           fill=FALSE,strip.white=T)
 
 
 adult.test <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test",
-                          sep=",",header=F,col.names=c("age", "type_employer", "fnlwgt", "education", 
-                                                       "education_num","marital", "occupation", "relationship", "race","sex",
-                                                       "capital_gain", "capital_loss", "hr_per_week","country", "income"),
+                          sep=",",header=F,col.names=c("age", "type.employer", "fnlwgt", "education", 
+                                                       "education.num","marital", "occupation", "relationship", "race","sex",
+                                                       "capital.gain", "capital.loss", "hr.per.week","country", "income"),
                           fill=FALSE,strip.white=T,skip=1)
 
 PreProcessAdult <- function(data){
@@ -24,18 +23,17 @@ PreProcessAdult <- function(data){
   # Returns:
   #   Dataframe of preprocessed data. 
   
-  # Remove technical variables
-  data <- subset(data, select=-c(fnlwgt,education_num))
-  
   # ? to NA
   is.na(data) = data=='?'
   is.na(data) = data==' ?'
   
   # Center and scale continuous variables
   data$age <- as.numeric(scale(data$age, center = TRUE, scale = TRUE))
-  data$capital_gain <- as.numeric(scale(data$capital_gain, center = TRUE, scale = TRUE))
-  data$capital_loss <- as.numeric(scale(data$capital_loss, center = TRUE, scale = TRUE))
-  data$hr_per_week <- as.numeric(scale(data$hr_per_week, center = TRUE, scale = TRUE))
+  data$capital.gain <- as.numeric(scale(data$capital.gain, center = TRUE, scale = TRUE))
+  data$capital.loss <- as.numeric(scale(data$capital.loss, center = TRUE, scale = TRUE))
+  data$hr.per.week <- as.numeric(scale(data$hr.per.week, center = TRUE, scale = TRUE))
+  data$fnlwgt <- as.numeric(scale(data$fnlwgt, center = TRUE, scale = TRUE))
+  data$education.num <- as.numeric(scale(data$education.num, center = TRUE, scale = TRUE))
   
   # Make response 0/1
   data$income = as.factor(ifelse(data$income==data$income[1],0,1))
