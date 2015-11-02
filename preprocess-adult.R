@@ -1,52 +1,177 @@
-# Prepare adult dataset
+# Preprocess adult dataset
+
+# Libraries
+# require(devtools) # we can add fancier methods later
+# devtools::install_github("jeffwong/imputation") # import imputation methods
+# require(imputation)
 
 # Load data from UCI repository
 adult.train <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
-                          sep=",",header=F,col.names=c("age", "type.employer", "fnlwgt", "education", 
-                                                       "education.num","marital", "occupation", "relationship", "race","sex",
-                                                       "capital.gain", "capital.loss", "hr.per.week","country", "income"),
+                          sep=",",header=F,col.names=c("age", "workclass", "fnlwgt", "education", 
+                                                       "education.num","marital.status", "occupation", "relationship", "race","sex",
+                                                       "capital.gain", "capital.loss", "hours.per.week","native.country", "label"),
                           fill=FALSE,strip.white=T)
 
 
 adult.test <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test",
-                          sep=",",header=F,col.names=c("age", "type.employer", "fnlwgt", "education", 
-                                                       "education.num","marital", "occupation", "relationship", "race","sex",
-                                                       "capital.gain", "capital.loss", "hr.per.week","country", "income"),
-                          fill=FALSE,strip.white=T,skip=1)
+                         sep=",",header=F,col.names=c("age", "workclass", "fnlwgt", "education", 
+                                                      "education.num","marital.status", "occupation", "relationship", "race","sex",
+                                                      "capital.gain", "capital.loss", "hours.per.week","native.country", "label"),
+                         fill=FALSE,strip.white=T,skip=1)
 
-PreProcessAdult <- function(data){
+# Preprocess data
+
+PreProcessAdult <- function(train,test,imp.method="none",scale.method=2){
   # Preprocess UCI Adult data. 
   #
   # Args:
-  #   data: Dataframe of features and response.
+  #   train: Dataframe of training features and response.
+  #   test: Dataframe of test features and response. 
+  #   imp.method: Method for data imputation. Options are "mean", "median", or "none". Default is "none".
+  #   scale.method:  1: Mean 0 and standard deviation 1; or 2: Midrange 0 and range 2 (i.e., minimum -1 and maximum 1). Default is 2.
   #
   # Returns:
-  #   Dataframe of preprocessed data. 
+  #   List containing labels and preprocessed features for train and test sets.
   
-  # ? to NA
-  is.na(data) = data=='?'
-  is.na(data) = data==' ?'
+  # Make labels binary
+  train$label <- as.factor(ifelse(train$label==train$label[1],0,1))
+  test$label <- as.factor(ifelse(test$label==test$label[1],0,1))
   
-  # Center and scale continuous variables
-  data$age <- as.numeric(scale(data$age, center = TRUE, scale = TRUE))
-  data$capital.gain <- as.numeric(scale(data$capital.gain, center = TRUE, scale = TRUE))
-  data$capital.loss <- as.numeric(scale(data$capital.loss, center = TRUE, scale = TRUE))
-  data$hr.per.week <- as.numeric(scale(data$hr.per.week, center = TRUE, scale = TRUE))
-  data$fnlwgt <- as.numeric(scale(data$fnlwgt, center = TRUE, scale = TRUE))
-  data$education.num <- as.numeric(scale(data$education.num, center = TRUE, scale = TRUE))
+  # Drop education string
+  train <- subset(train, select=-c(education))
+  test <- subset(test, select=-c(education))
   
-  # Make response 0/1
-  data$income = as.factor(ifelse(data$income==data$income[1],0,1))
+  # Convert ? to NA
+  is.na(train) <- train=='?'
+  is.na(test) <- test=='?'
   
-  return(data)
+  missing <- c("workclass","occupation","native.country")
+  
+  for(x in missing) {
+    train[x] <- droplevels(train[x])
+    test[x] <- droplevels(test[x])
+  }
+  
+  # Replace dashes with periods in factor labels
+  ReplaceDashes <- function(feature) {
+    feature <- gsub("-",".",feature)
+    return(as.factor(feature))
+  }
+  
+  categorical <- c("workclass", "marital.status", "occupation","relationship","race","native.country")
+  
+  for(x in categorical) {
+    train[,x] <- ReplaceDashes(train[,x])
+    test[,x] <- ReplaceDashes(test[,x])
+  }
+  
+  # Create dummy variables for factor variables
+  train.dummies <- dummyVars(label ~ ., data = train)
+  train.bin <- predict(train.dummies, newdata = train)
+  
+  test.dummies <- dummyVars(label ~ ., data = test)
+  test.bin <- predict(test.dummies, newdata = test)
+  
+  # Impute missing values
+  if(imp.method=="median"){
+    median.train <- sapply(colnames(train.bin), function(x){
+      median(train.bin[,x], na.rm=TRUE)
+    })
+    train.impute <- train.bin
+    for(x in 1:ncol(train.bin)){
+      train.bin[,x][is.na(train.bin[,x])] <- median.train[x]
+    }
+    test.impute <- test.bin
+    for(x in 1:ncol(test.bin)){
+      test.bin[,x][is.na(test.bin[,x])] <- median.train[x] # use train median to impute test set
+    }
+  }
+  
+  if(imp.method=="mean"){
+    mean.train <- sapply(colnames(train.bin), function(x){
+      mean(train.bin[,x], na.rm=TRUE)
+    })
+    train.impute <- train.bin
+    for(x in 1:ncol(train.bin)){
+      train.bin[,x][is.na(train.bin[,x])] <- mean.train[x]
+    }
+    test.impute <- test.bin
+    for(x in 1:ncol(test.bin)){
+      test.bin[,x][is.na(test.bin[,x])] <- mean.train[x] # use train mean to impute test set
+    }
+  }
+  else{
+    train.impute <- train.bin
+    test.impute <- test.bin
+  }
+  
+  continuous <- c("age","capital.gain","capital.loss","hours.per.week","fnlwgt","education.num")
+  
+  # Standardize features
+  if(scale.method==1){
+    # Center and scale continuous features
+    center.scale <- preProcess(train.impute[,continuous], method = c("center","scale")) 
+    train.impute[,continuous] <- predict(center.scale, newdata=train.impute[,continuous]) 
+    test.impute[,continuous] <- predict(center.scale, newdata=test.impute[,continuous])  # scale test set with training set mean and sd
+  }
+  
+  if(scale.method==1){
+    # Standardize X to mean 0 and standard deviation 1:
+    mean.train <- sapply(colnames(train.impute), function(x){
+      mean(train.impute[,x],na.rm=TRUE)
+    })  
+    
+    sd.train <- sapply(colnames(train.impute), function(x){ 
+      sd(train.impute[,x],na.rm=TRUE)
+    }) 
+    
+    for(x in 1:ncol(train.impute)){
+      train.impute[,x] <- (train.impute[,x] - mean.train[x])/(sd.train[x])
+    }
+    
+    for(x in 1:ncol(test.impute)){
+      test.impute[,x] <- (test.impute[,x] - mean.train[x])/(sd.train[x]) # use train set mean and sd
+    }
+  }
+  
+  if(scale.method==2){
+    # Midrange 0 and range 2 (-1 to 1) for ALL features
+    midrange.train <- sapply(colnames(train.impute), function(x){
+      (max(train.impute[,x],na.rm=TRUE) + min(train.impute[,x],na.rm=TRUE))/2
+    })  
+    
+    range.train <- sapply(colnames(train.impute), function(x){ 
+      max(train.impute[,x],na.rm=TRUE) - min(train.impute[,x],na.rm=TRUE)
+    }) 
+    
+    for(x in 1:ncol(train.impute)){
+      train.impute[,x] <- (train.impute[,x] - midrange.train[x])/(range.train[x]/2)
+    }
+    
+    for(x in 1:ncol(test.impute)){
+      test.impute[,x] <- (test.impute[,x] - midrange.train[x])/(range.train[x]/2) # use train set midrange and range values
+    }
+  }
+  
+  return(list("train.features"=train.impute,
+              "train.labels"=train$label,
+              "test.features"=test.impute,
+              "test.labels"=test$label))
 }
+## Preprocess and export data
 
-# Preprocess and export data
+# No imputation
+adult.pre <- PreProcessAdult(adult.train, adult.test, imp.method="none") 
 
-adult.train <- PreProcessAdult(adult.train)
+write.table(adult.pre[["train.labels"]],"adult-train-labels.csv") 
+write.table(adult.pre[["test.labels"]],"adult-test-labels.csv")
 
-write.table(adult.train,"adult-train.csv")
+write.table(adult.pre[["train.features"]],"adult-train-features.csv")
+write.table(adult.pre[["test.features"]],"adult-test-features.csv")
 
-adult.test <- PreProcessAdult(adult.test)
+# Median imputation
+adult.pre.median <- PreProcessAdult(adult.train, adult.test, imp.method="median") 
 
-write.table(adult.train,"adult-test.csv")
+write.table(adult.pre.median[["train.features"]],"adult-train-features-median.csv")
+write.table(adult.pre.median[["test.features"]],"adult-test-features-median.csv")
+
