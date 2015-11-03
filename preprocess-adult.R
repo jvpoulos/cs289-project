@@ -4,6 +4,7 @@
 # require(devtools) # we can add fancier methods later
 # devtools::install_github("jeffwong/imputation") # import imputation methods
 # require(imputation)
+require(caret)
 
 # Load data from UCI repository
 adult.train <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
