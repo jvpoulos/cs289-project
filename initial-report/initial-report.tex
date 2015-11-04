@@ -112,43 +112,46 @@ Jason Poulos\thanks{\href{mailto:poulos@berkeley.edu}{\nolinkurl{poulos@berkeley
 \maketitle
 
 \section{Motivation}
+In our project, we plan to investigate techniques for handling missing data and
+encoding categorical data such that it is appropriate to neural networks.  
 
-Methods of handling missing data for neural networks classification model
+% As a first step, we plan to use NNets for income prediction ($income \geq \$
+% 50K/yr$) on the Adult dataset.
 
-Given that we plan to use NNets for income prediction ($income \geq \$ 50K/yr$) on the Adult dataset, we must handle missing data. This is less problematic for ML models such as random forest, decision trees, etc.
-
-%Include necessary ?background? information:
+%Include necessary background information:
   % What is the application domain and/or field of research?
   % Why is the problem important?
   % What specific questions are you trying to answer?
 
-Item nonresponse is a common problem in survey data in several domains. Several techniques for data imputation (replace missing values with plausible ones) and direct estimation(all missing data is analyzed using a maximum likelihood approach) have been developed \cite{de2003prevention}.
+Item nonresponse is a common problem in survey data in various domains. Several
+techniques for data imputation (replace missing values with plausible ones) and
+direct estimation (all missing data is analyzed using a maximum likelihood
+approach) have been developed \cite{de2003prevention}.
 
-Proper statistical adjustement of missing data is very important, as naive solutions might introduce bias. We're interested in using the data to train neuronal networks. This must be taken into account becouse higher input values will result in a higher activation input.
 
-In this project, we plan to evaluate different data imputation and direct estimation techniques within the context of using a neural network income classifier on the ADULT dataset. We plan to compare our results to previous techniques and models, such as bla bla bla, that addressed this same question.
+In addition, given that categorical variables have no direct representation or computation scheme of the distance between its values, decision trees can be useful because they do not require distance metrics. However, they might not be suitable for problems where the decision boundary between classes is described by a second-order polynomial, for example.\cite{fayyad1996data}
 
 \section{Data}
-
-We plan to experiment with the Adult data set and then, given the results, move to the a larger sensus dataset.
+Our experimet will start with the Adult dataset and move to a larger sensus dataset.
 \subsection{Adult data set}
+\resizebox{\textwidth}{!}{
+    \begin{tabular}{ l l | l l | l l}
+      \hline
+      Characteristics: & Multivariate &
+      Observations: & 48842 &
+      Area: & Social \\
 
-\begin{tabular}{ l l | l l | l l}
-  \hline
-  Characteristics: & Multivariate &
-  Observations: & 48842 &
-  Area: & Social \\
+      Features: & Categorical, Integer &
+      Number of features: & 14 &
+      Date Donated: & 1996-05-01 \\
 
-  Features: & Categorical, Integer &
-  Number of features: & 14 &
-  Date Donated: & 1996-05-01 \\
+      Associated Tasks: & Classification &
+      Missing Values? & Yes &
+      Number of Web Hits: & 559776 \\
 
-  Associated Tasks: & Classification &
-  Missing Values? & Yes &
-  Number of Web Hits: & 559776 \\
-
-  \hline
-\end{tabular}
+      \hline
+    \end{tabular}
+}
 
 \subsection{Benchmarks}
 % Table comparing accuracies for different models
@@ -176,21 +179,46 @@ We plan to experiment with the Adult data set and then, given the results, move 
 % Explain which methods you are planning to use and why.
 
 \subsection{Techniques for handling missing data}
-Assuming that the techniques below are easy to implemet, we would like to compare their efficiency in imputing the missing values.
+We divide imputation methods into six groups listed
+below\cite{batista2003analysis}. Assuming that these techniques are easy to
+implement, we would like to compare their efficiency in imputing the missing
+values.
 
 \begin{enumerate}
-\item Basic Statistics : Replace the missing data with the mean or median of the feature vector. This is the most naive approach and since the missing variables in the ADULT dataset are all categorical, using the mean is not appropriated.
-\item One-hot : Create an binary variable to indicate whether or not a specific feature is missing. This technique was mentioned by Isabelle
-\item Nearest Neighbor Imputation : Recursively compute the K-Nearest Neighbors of the observation with missing data and assign median of the K-neighbors to the missing data. This technique is used in airbnb's fraud detection algorithm and explained in their website.
-\item Logistic Regression : train a logistic regression model with all features except the feature with the missing variable to predict the missing value.
-\item Bagging : Use one bag tree model for each predictor based on all other
-   predictors.
-\item Factor analysis : Perform some sort of factorization on the design matrix, project the design matrix onto the first two eigen vectors and replace the missing values by the values that might be given by the projected design matrix.
-\item Find other features with distribution similar to the feature containing missing data and use this information (e.g. correlation) to fill in in the missing data. However, if two features are highly correlated, it might be better to remove one of them.
+\item Case substitution: one observation with missing data is replaced with
+    another non-sampled instance.
+\item Mean or mode imputation: Replace the missing data with the mean or median of
+    the feature vector. This is the most naive approach and since the missing
+    variables in the ADULT dataset are all categorical, using the mean is not
+    appropriated.
+\item One-hot: Create an binary variable to indicate whether or not a specific
+    feature is missing. This technique was mentioned by Isabelle
+\item Hot deck and cold deck: Compute the K-Nearest Neighbors of the
+    observation with missing data and assign the mean or median of the K-neighbors
+    to the missing data. A similar technique is used in Airbnb's fraud detection
+    algorithm.
+\item Prediction Model: train a prediction model, e.g. logistic regression and
+    baggin, with all features except the feature with the missing variable to
+    predict the missing value. This requires correlation amongst variables to
+    exist.
+\item Factor analysis: Perform some sort of factorization on the design
+    matrix, project the design matrix onto the first two eigen vectors and
+    replace the missing values by the values that might be given by the
+    projected design matrix.
 \end{enumerate}
 
-\subsection{Neural networks for classification}
+\subsection{Neural networks for classification with categorical and
+quantitative features}  Techniques for handling categorical data in neuronal
+networks include encoding the categorical values into numeric values, using
+binary encoding. These methods, however, have many drawbacks including
+unnecessarily increasing the dimensionality or not preserving the similarity
+information embedded betweeng categorical values\cite{hsu2006generalizing}.
 
+More elaborate techniques include information theoretic measures
+\cite{wang2008categorical}, training separate output units for
+each of the allowed combination of values of the categorical independent
+variables\cite{brouwer2002feed}, and using distance
+hierarchies\cite{hsu2006generalizing}.
 \section{Anticipated results}
 
 \pagebreak
