@@ -2,31 +2,38 @@
 
 # Libraries
 require(ggplot2)
-require(GGally)
+#require(GGally)
+require(VIM)
 
-patient <- FALSE
+# Load data from UCI repository
+adult.train <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
+                          sep=",",header=F,col.names=c("age", "workclass", "fnlwgt", "education", 
+                                                       "education.num","marital.status", "occupation", "relationship", "race","sex",
+                                                       "capital.gain", "capital.loss", "hours.per.week","native.country", "label"),
+                          fill=FALSE,strip.white=T)
 
-if(patient){
-# Plot pairwise correlations and distributions for continuous features
-png("pairs-plot-continuous.png", width=650, height=500)
-ggpairs(adult.pre[["train.features"]][,c("age","fnlwgt","education.num","capital.gain","capital.loss","hours.per.week")], 
-        upper="blank",
-        columnLabels=c("Age","Sample wt.","Edu. no.", "Cap. gain", "Cap. loss", "Hrs./wk."))
-dev.off() 
+# Drop education string and label
+adult.train <- subset(adult.train, select=-c(education, label))
 
-# # Plot pairwise correlations and distributions for workclass & occupation
-# png("pairs-plot-binary.png", width=650, height=500)
-# ggpairs(adult.pre[["train.features"]][,c("workclass.Federal.gov", "workclass.Local.gov", "workclass.Never.worked", "workclass.Self.emp.inc", "workclass.Self.emp.not.inc", "workclass.State.gov", "workclass.Without.pay",
-#                                          "occupation.Adm.clerical", "occupation.Armed.Forces", "occupation.Craft.repair", "occupation.Exec.managerial", "occupation.Farming.fishing", "occupation.Handlers.cleaners",
-#                                          "occupation.Machine.op.inspct", "occupation.Other.service", "occupation.Priv.house.serv", "occupation.Prof.specialty", "occupation.Protective.serv", "occupation.Sales", "occupation.Tech.support", "occupation.Transport.moving")], 
-#         upper="blank",
-#         columnLabels=c("Federal-gov", "Local-gov", "Never-worked"," Self-emp-inc", "Self-emp-not-inc", "State-gov", "Without-pay",
-#                        "Adm-clerical", "Armed-Forces", "Craft-repair", "Exec-managerial", "Farming-fishing", "Handlers-cleaners",
-#                        "Machine-op-inspct", "Other-service", "Priv-house-serv", "Prof-specialty", "Protective-serv", "Sales", "Tech-support", "Transport-moving"))
-# dev.off() 
+# Convert ? to NA
+is.na(adult.train) <- adult.train=='?'
+
+missing <- c("workclass","occupation","native.country")
+
+for(x in missing) {
+  adult.train[x] <- droplevels(adult.train[x])
 }
 
-# Plot histogram for proportion of missing values per feature
-
-adult.pre[["train.features"]]
-
+# Plot the amount of missing values in each variable 
+pdf("missing-values-patterns.pdf", width=11.69, height=8.27)
+aggr(adult.train, col=c('navyblue','red'), 
+     numbers=TRUE, 
+     sortVars=TRUE, 
+     labels=c("Age","Work class", "Sample weight", "Education", "Marital status", "Occupation", "Relationship", "Race", "Sex", "Capital gain", "Capital loss", "Hours/week", "Native country"), 
+     cex.lab=.7,
+     cex.axis=.7,
+     cex.numbers=.7,
+     gap=3, 
+     ylab=c("Proportion of missing values per feature",
+            "Proportion of missing values per feature combination"))
+dev.off() 
