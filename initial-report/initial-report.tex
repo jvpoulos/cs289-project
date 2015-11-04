@@ -155,28 +155,45 @@ We plan to experiment with the Adult data set and then, given the results, move 
 
 \subsection{Patterns of missing values}
 
+%\begin{table}[htbp]
+%\centering
+%\caption{Proportion of missing values in each feature of Adult training set.}
+%\label{my-label}
+%\begin{tabular}{ll}
+%\textbf{Variable}   &   \textbf{Proportion}       \\
+%Occupation & 0.0566     \\
+%Work class & 0.0563     \\
+%Native country & 0.0179
+%\end{tabular}
+%\end{table}
+
 \begin{figure}[htbp] 
    \centering
    \includegraphics[scale=0.6]{proportion-missing.pdf} 
-   \caption{Histogram of proportion of missing values in each feature (Left) and aggregation plot of all existing combinations of missing and non-missing values in the samples (Right).}
+   \caption{Histogram of proportion of missing values in each feature (Left) of Adult training set and aggregation plot of all existing combinations of missing and non-missing values in the samples (Right).}
    \label{proportion-missing}
 \end{figure}
 
 \begin{figure}[htbp] 
    \centering
-   \includegraphics[scale=0.6]{scatter-matrix-missing.pdf} 
-   \caption{Scatterplot Matrix of features with missing values. Blue represents observed values and red represents missing values.}
-   \label{proportion-missing}
+   \includegraphics[scale=1]{scatter-matrix-missing.png} 
+   \caption{Scatterplot Matrix of features with missing values in Adult training set. Blue represents observed values and red represents missing values.}
+   \label{scatter-matrix-missing}
 \end{figure}
 
-% Table showing proportion of missing values for each feature
+\begin{figure}[htbp] 
+   \centering
+   \includegraphics[scale=0.6]{barplot-occ-missing.pdf} 
+   \caption{Barplot of the feature \textit{Occupation} in the Adult training set (blue). Imputed values in \textit{Work class} or \textit{Native country} are highlighted in red.}
+   \label{barplot-occ-missing}
+\end{figure}
 
 \section{Methods}
 
 % Explain which methods you are planning to use and why.
 
 \subsection{Techniques for handling missing data}
-Assuming that the techniques below are easy to implemet, we would like to compare their efficiency in imputing the missing values.
+Assuming that the techniques below are easy to implement, we would like to compare their efficiency in imputing the missing values.
 
 \begin{enumerate}
 \item Basic Statistics : Replace the missing data with the mean or median of the feature vector. This is the most naive approach and since the missing variables in the ADULT dataset are all categorical, using the mean is not appropriated.
