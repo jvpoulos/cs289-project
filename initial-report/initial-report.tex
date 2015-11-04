@@ -1,10 +1,14 @@
 \title{CS289 Initial Report: \\
-Methods of handling missing data for classification
+Methods for handling missing and categorical data for classification with neural
+networks
 \vspace{15mm}}
 
-\author{Rafael Valle\thanks{\href{mailto:rafaelvalle@berkeley.com}{\nolinkurl{rafaelvalle@berkeley.com}}.} \hspace{10mm}
-Jason Poulos\thanks{\href{mailto:poulos@berkeley.edu}{\nolinkurl{poulos@berkeley.edu}}.}
-\vspace{15mm}}
+\author{
+    Jason Poulos\thanks{\href{mailto:poulos@berkeley.edu}{\nolinkurl{poulos@berkeley.edu}}.}
+    \hspace{10mm}
+    Rafael Valle\thanks{\href{mailto:rafaelvalle@berkeley.com}{\nolinkurl{rafaelvalle@berkeley.com}}.}
+    \vspace{15mm}
+}
 
 \date{\today}
 
@@ -112,31 +116,33 @@ Jason Poulos\thanks{\href{mailto:poulos@berkeley.edu}{\nolinkurl{poulos@berkeley
 \maketitle
 
 \section{Motivation}
-In our project, we plan to investigate techniques for handling missing data and
-encoding categorical data such that it is appropriate to neural networks.  
-
-% As a first step, we plan to use NNets for income prediction ($income \geq \$
-% 50K/yr$) on the Adult dataset.
-
 %Include necessary background information:
   % What is the application domain and/or field of research?
   % Why is the problem important?
   % What specific questions are you trying to answer?
+In our project, we plan to investigate techniques for handling missing data and
+encoding categorical data such that it is appropriate to neural network
+classifiers. \\
 
-Item nonresponse is a common problem in survey data in various domains. Several
+Missing data is a common problem in survey data in various domains. Several
 techniques for data imputation (replace missing values with plausible ones) and
 direct estimation (all missing data is analyzed using a maximum likelihood
-approach) have been developed \cite{de2003prevention}.
+approach) have been developed.\citep{de2003prevention} \\
 
+In the case of categorical variables, which by definition have no direct
+representation or computation scheme of the distance between its values,
+decision trees can be useful because they do not require distance metrics.
+However, their training process is slow given a large enough dataset and they
+might not be suitable for problems where the decision boundary between classes
+described by a second-order polynomial\footnote{We note, however, that a
+property test can be as complex as the data at hand.}, for
+example.\citep{fayyad1996data} \\
 
-In addition, given that categorical variables have no direct representation or computation scheme of the distance between its values, decision trees can be useful because they do not require distance metrics. However, they might not be suitable for problems where the decision boundary between classes is described by a second-order polynomial, for example.\cite{fayyad1996data}
-
+\newpage
 \section{Data}
 \subsection{Benchmarks}
 % Table comparing accuracies for different models
-=======
-
-%Talk about what data sources you are planning to use, including number of samples and number of features (if it's visual data -- include a sample).
+% Talk about what data sources you are planning to use, including number of samples and number of features (if it's visual data -- include a sample).
 
 We plan to experiment with the Adult dataset from the UCI Machine Learning Repository \citep{Lichman2013}. The dataset has 48,842 samples ($\mathrm{train}=32,561$ and $\mathrm{test}=1,6281$). The dataset contains 14 features: 6 continuous and 8 categorical. The prediction task is to determine whether a person makes over \$50,000 a year; 24\% of individuals in the training data make more than this amount. \\
 
@@ -176,21 +182,21 @@ Uncovering patterns of missing values in the dataset will help select strategies
 
 \begin{figure}[htbp] 
    \centering
-   \includegraphics[scale=0.6]{proportion-missing.pdf} 
+   \includegraphics[scale=.6]{proportion-missing.pdf} 
    \caption{Histogram of proportion of missing values in each feature (Left) of Adult training set and aggregation plot of all existing combinations of missing and non-missing values in the samples (Right).}
    \label{proportion-missing}
 \end{figure}
 
 \begin{figure}[htbp] 
    \centering
-   \includegraphics[scale=1]{scatter-matrix-missing.png} 
+   \includegraphics[scale=.8]{scatter-matrix-missing.png} 
    \caption{Scatterplot Matrix of features with missing values in Adult training set. Blue represents observed values and red represents missing values.}
    \label{scatter-matrix-missing}
 \end{figure}
 
 \begin{figure}[htbp] 
    \centering
-   \includegraphics[scale=0.6]{barplot-occ-missing.pdf} 
+   \includegraphics[scale=.6]{barplot-occ-missing.pdf} 
    \caption{Barplot of the feature \textit{Occupation} in the Adult training set (blue). Imputed values in \textit{Work class} or \textit{Native country} are highlighted in red.}
    \label{barplot-occ-missing}
 \end{figure}
@@ -201,46 +207,48 @@ Uncovering patterns of missing values in the dataset will help select strategies
 
 \subsection{Techniques for handling missing data}
 We divide imputation methods into six groups listed
-below\cite{batista2003analysis}. Assuming that these techniques are easy to
+below\citep{batista2003analysis}. Assuming that these techniques are easy to
 implement, we would like to compare their efficiency in imputing the missing
 values.
 
-\begin{enumerate}
-\item Case substitution: one observation with missing data is replaced with
-    another non-sampled instance.
-\item Mean or mode imputation: Replace the missing data with the mean or median of
-    the feature vector. This is the most naive approach and since the missing
-    variables in the ADULT dataset are all categorical, using the mean is not
-    appropriated.
-\item One-hot: Create an binary variable to indicate whether or not a specific
-    feature is missing. This technique was mentioned by Isabelle
-\item Hot deck and cold deck: Compute the K-Nearest Neighbors of the
+\begin{description}
+\item[Case substitution] One observation with missing data is replaced with
+another non-sampled observation.
+\item[Mean or mode imputation] Replace the missing data with the mean or median of
+    the feature vector. Since the missing variables in the ADULT dataset are
+    all categorical, using a numerical approach directly is not appropriated.
+\item[One-hot] Create a binary variable to indicate whether or not a specific
+    feature is missing. This technique was suggested by Isabelle Guyon.
+\item[Hot deck and cold deck] Compute the K-Nearest Neighbors of the
     observation with missing data and assign the mean or median of the K-neighbors
     to the missing data. A similar technique is used in Airbnb's fraud detection
     algorithm.
-\item Prediction Model: train a prediction model, e.g. logistic regression and
-    baggin, with all features except the feature with the missing variable to
-    predict the missing value. This requires correlation amongst variables to
-    exist.
-\item Factor analysis: Perform some sort of factorization on the design
+\item[Prediction Model] Train a prediction model, e.g. logistic regression or  
+    bagging, with all features to predict the missing missing value. This
+    requires correlation amongst features to exist.
+\item[Factor analysis] Perform some sort of factorization on the design
     matrix, project the design matrix onto the first two eigen vectors and
     replace the missing values by the values that might be given by the
     projected design matrix.
-\end{enumerate}
+\end{description}
 
 \subsection{Neural networks for classification with categorical and
-quantitative features}  Techniques for handling categorical data in neuronal
-networks include encoding the categorical values into numeric values, using
-binary encoding. These methods, however, have many drawbacks including
-unnecessarily increasing the dimensionality or not preserving the similarity
-information embedded betweeng categorical values\cite{hsu2006generalizing}.
+quantitative features}  Common techniques for handling categorical data in
+neuronal networks include encoding the categorical values into numeric values
+or using binary encoding. These techniques, however, have some drawbacks
+including unnecessarily increasing model complexity or feature dimensionality
+and not preserving the similarity information embedded betweeng categorical
+values\citep{hsu2006generalizing}.\\
 
 More elaborate techniques include information theoretic measures
-\cite{wang2008categorical}, training separate output units for
+\citep{wang2008categorical}, training separate output units for
 each of the allowed combination of values of the categorical independent
-variables\cite{brouwer2002feed}, and using distance
-hierarchies\cite{hsu2006generalizing}.
+variables\citep{brouwer2002feed}, and using distance
+hierarchies\citep{hsu2006generalizing}.
+
+\newpage
 \section{Anticipated results}
+We anticipate that bla, bla, bla.
 
 \pagebreak
 
