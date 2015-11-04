@@ -25,7 +25,7 @@ for(x in missing) {
 }
 
 # Plot the amount of missing values in each variable 
-pdf("missing-values-patterns.pdf", width=11.69, height=8.27)
+pdf("proportion-missing.pdf", width=11.69, height=8.27)
 aggr(adult.train, col=c('navyblue','red'), 
      numbers=TRUE, 
      sortVars=TRUE, 
@@ -36,4 +36,9 @@ aggr(adult.train, col=c('navyblue','red'),
      gap=3, 
      ylab=c("Proportion of missing values per feature",
             "Proportion of missing values per feature combination"))
+dev.off() 
+
+pdf("scatter-matrix-missing.pdf", width=11.69, height=8.27)
+scattmatrixMiss(adult.train[c("workclass","occupation","native.country")],
+                labels=c("Work class", "Occupation", "Native country"))
 dev.off() 
