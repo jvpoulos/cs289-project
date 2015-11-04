@@ -38,11 +38,11 @@ aggr(adult.train, col=c('navyblue','red'),
             "Proportion of missing values per feature combination"))
 dev.off() 
 
-# Plot scatterplot matrix of missing
-pdf("scatter-matrix-missing.pdf", width=11.69, height=8.27)
-scattmatrixMiss(adult.train[c("workclass","occupation","native.country")],
-                labels=c("Work class", "Occupation", "Native country"))
-dev.off() 
+# # Plot scatterplot matrix of missing
+# pdf("scatter-matrix-missing.pdf", width=11.69, height=8.27)
+# scattmatrixMiss(adult.train[c("workclass","occupation","native.country")],
+#                 labels=c("Work class", "Occupation", "Native country"))
+# dev.off() 
 
 # Barplot of missing
 pdf("barplot-occ-missing.pdf", width=11.69, height=8.27)
@@ -54,3 +54,4 @@ barMiss(adult.train[c("workclass","occupation","native.country")],
         ylab = "Number of missing/observed in Occupation",
         xlab = "Occupation")
 dev.off()
+           

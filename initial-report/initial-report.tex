@@ -164,9 +164,9 @@ Given the results of our experiments and if time permits, we may move to a much 
 
 \subsection{Patterns of missing values}
 
-The Adult dataset has 3,620 (7.4\%) samples containing missing values. Missing values occur in three of the categorical features: \textit{Work class}, \textit{Occupation}, and \textit{Native country}. It is unlikely that these values are missing completely at random (MCAR); it is more likely, and much less desirable that the values are not missing at random (MNAR). Since these data originate from a survey, the missing values may be due to respondents unwilling or unable to provide an answer.  
+The Adult dataset has 3,620 (7.4\%) samples containing missing values. Missing values occur in three of the categorical features: \textit{Work class}, \textit{Occupation}, and \textit{Native country}. It is unlikely that these values are missing completely at random (MCAR); it is more likely, and much less desirable that the values are not missing at random (MNAR). Since these data originate from a survey, the missing values may be due to respondents unwilling or unable to provide an answer.  \\
 
-Uncovering patterns of missing values in the dataset will help select strategies for imputing missing values. Figure \ref{proportion-missing}
+Uncovering patterns of missing values in the dataset will help select strategies for imputing missing values. The histogram (left) in Figure \ref{proportion-missing} shows \textit{Work class} and \textit{Occupation} each have about 5.6\% of missing values, and \textit{Native country} has about 1.7\% missing values. The aggregation plot (right) shows 5.5\% of samples are missing values for both \textit{Work class} and \textit{Occupation}. Less than 2\% of samples are missing just \textit{Native country} and less than 1\% are missing all three features.
 
 \begin{figure}[htbp] 
    \centering
@@ -175,12 +175,12 @@ Uncovering patterns of missing values in the dataset will help select strategies
    \label{proportion-missing}
 \end{figure}
 
-\begin{figure}[htbp] 
-   \centering
-   \includegraphics[scale=1]{scatter-matrix-missing.png} 
-   \caption{Scatterplot Matrix of features with missing values in Adult training set. Blue represents observed values and red represents missing values.}
-   \label{scatter-matrix-missing}
-\end{figure}
+%\begin{figure}[htbp] 
+%   \centering
+%   \includegraphics[scale=1]{scatter-matrix-missing.png} 
+%   \caption{Scatterplot Matrix of features with missing values in Adult training set. Blue represents observed values and red represents missing values.}
+%   \label{scatter-matrix-missing}
+%\end{figure}
 
 \begin{figure}[htbp] 
    \centering
