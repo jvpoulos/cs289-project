@@ -130,42 +130,43 @@ In this project, we plan to evaluate different data imputation and direct estima
 
 \section{Data}
 
-We plan to experiment with the Adult data set and then, given the results, move to the a larger sensus dataset.
-\subsection{Adult data set}
+%Talk about what data sources you are planning to use, including number of samples and number of features (if it's visual data -- include a sample).
 
-\begin{tabular}{ l l | l l | l l}
-  \hline
-  Characteristics: & Multivariate &
-  Observations: & 48842 &
-  Area: & Social \\
+We plan to experiment with the Adult dataset from the UCI Machine Learning Repository \citep{Lichman2013}. The dataset has 48,842 samples ($\mathrm{train}=32,561$ and $\mathrm{test}=1,6281$). The dataset contains 14 features: 6 continuous and 8 categorical. The prediction task is to determine whether a person makes over \$50,000 a year; 24\% of individuals in the training data make more than this amount. \\
 
-  Features: & Categorical, Integer &
-  Number of features: & 14 &
-  Date Donated: & 1996-05-01 \\
+Table \ref{benchmarks} shows the test error rates obtained by the data set donor \citep{kohavi1996}. All error rates were obtained after removing samples with missing values. The error rate to beat is 14.05\%. \\
 
-  Associated Tasks: & Classification &
-  Missing Values? & Yes &
-  Number of Web Hits: & 559776 \\
+Given the results of our experiments and if time permits, we may move to a much larger dataset, such as the 1940 full--count U.S. Census file \citep{napp2008, ruggles2010}. The 1940 Census has about 100 million samples and 100 features. 
 
-  \hline
+\begin{table}[htb]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Algorithm}       & \textbf{Error} \\ \midrule
+1  C4.5                  & 15.54          \\
+2  C4.5-auto             & 14.46          \\
+3  C4.5 rules            & 14.94          \\
+4  Voted ID3 (0.6)       & 15.64          \\
+5  Voted ID3 (0.8)       & 16.47          \\
+6  T2                    & 16.84          \\
+7  1R                    & 19.54          \\
+8  NBTree                & 14.10          \\
+9  CN2                   & 16.00          \\
+10 HOODG                 & 14.82          \\
+11 FSS Naive Bayes       & 14.05          \\
+12 IDTM (Decision table) & 14.46          \\
+13 Naive-Bayes           & 16.12          \\
+14 Nearest-neighbor (1)  & 21.42          \\ \bottomrule
 \end{tabular}
-
-\subsection{Benchmarks}
-% Table comparing accuracies for different models
+\caption{Test set error rates on Adult dataset for various algorithms, obtained after removal of samples with missing values and using the original train/test split. Source: \citet{Lichman2013}.}
+\label{benchmarks}
+\end{table}
 
 \subsection{Patterns of missing values}
 
-%\begin{table}[htbp]
-%\centering
-%\caption{Proportion of missing values in each feature of Adult training set.}
-%\label{my-label}
-%\begin{tabular}{ll}
-%\textbf{Variable}   &   \textbf{Proportion}       \\
-%Occupation & 0.0566     \\
-%Work class & 0.0563     \\
-%Native country & 0.0179
-%\end{tabular}
-%\end{table}
+The Adult dataset has 3,620 (7.4\%) samples containing missing values. Missing values occur in three of the categorical features: \textit{Work class}, \textit{Occupation}, and \textit{Native country}. It is unlikely that these values are missing completely at random (MCAR); it is more likely, and much less desirable that the values are not missing at random (MNAR). Since these data originate from a survey, the missing values may be due to respondents unwilling or unable to provide an answer.  
+
+Uncovering patterns of missing values in the dataset will help select strategies for imputing missing values. Figure \ref{proportion-missing}
 
 \begin{figure}[htbp] 
    \centering
@@ -207,8 +208,6 @@ Assuming that the techniques below are easy to implement, we would like to compa
 \end{enumerate}
 
 \subsection{Neural networks for classification}
-
-\section{Anticipated results}
 
 \pagebreak
 
