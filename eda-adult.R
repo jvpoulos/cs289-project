@@ -70,6 +70,7 @@ workclass.missing <- ggplot(adult.train, aes(x = workclass, fill = occ.native.mi
   ylab("") + 
   xlab("") +
   ggtitle("Work class") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_fill_discrete(name="Missing in
 Occupation or Native country",
                       labels=c("No", "Yes"))
