@@ -44,43 +44,44 @@ dev.off()
 #                 labels=c("Work class", "Occupation", "Native country"))
 # dev.off() 
 
-# Barplot of missing
+# # Barplot of missing
 # pdf("barplot-occ-missing.pdf", width=11.69, height=8.27)
 # barMiss(adult.train[c("workclass","occupation","native.country")],
+#         pos=2,
 #         selection = "any",
 #         cex.lab=.6,
 #         cex.axis=.5,
 #         ylab = "Number of missing/observed in Occupation",
-#         xlab = "Occupation")
+#         xlab = "")
 # dev.off()
 
-adult.train$workclass.missing <- ifelse(is.na(adult.train$workclass),1,0)
-adult.train$occupation.missing <- ifelse(is.na(adult.train$occupation),1,0)
-adult.train$native.country.missing <- ifelse(is.na(adult.train$native.country),1,0)
+# Barplot of missing
+adult.train$workclass.missing <- as.factor(ifelse(is.na(adult.train$workclass),1,0))
+adult.train$occupation.missing <- as.factor(ifelse(is.na(adult.train$occupation),1,0))
+adult.train$native.country.missing <- as.factor(ifelse(is.na(adult.train$native.country),1,0))
 
-workclass.missing <- ggplot(adult.train, aes(x = workclass, fill = workclass.missing)) + 
+adult.train$occ.native.missing <- as.factor(ifelse(is.na(adult.train$occupation) | is.na(adult.train$native.country),1,0))
+
+
+workclass.missing <- ggplot(adult.train, aes(x = workclass, fill = occ.native.missing)) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  scale_y_continuous(limits=c(0, 1), breaks=c(0,0.25,0.5,0.75,1),labels=c("0", "25", "50", "75", "100")) + 
-  ylab() + 
+  scale_y_continuous(limits=c(0, 0.75), breaks=c(0,0.25,0.5,0.75),labels=c("0", "25", "50", "75")) + 
+  ylab("") + 
   xlab("") +
   ggtitle("Work class") +
-  theme(legend.position="none") 
+  scale_fill_discrete(name="Missing in Occupation\
+                      or Native country",
+                      labels=c("No", "Yes"))
 
 occupation.missing <- ggplot(adult.train, aes(x = occupation, fill = occupation.missing)) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  scale_y_continuous(limits=c(0, 1), breaks=c(0,0.25,0.5,0.75,1),labels=c("0", "25", "50", "75", "100")) + 
-  ylab() + 
+  scale_y_continuous(limits=c(0, 0.75), breaks=c(0,0.25,0.5,0.75),labels=c("0", "25", "50", "75")) + 
+  ylab("") + 
   xlab("") +
   ggtitle("Occupation") +
-  theme(legend.position="none") 
+  theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1))
 
-native.country.missing <- ggplot(adult.train, aes(x = native.country, fill = native.country.missing)) + 
-  geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  scale_y_continuous(limits=c(0, 1), breaks=c(0,0.25,0.5,0.75,1),labels=c("0", "25", "50", "75", "100")) + 
-  ylab() + 
-  xlab("") +
-  ggtitle("Native country") +
-  theme(legend.position="none") 
-
-grid.arrange(time.lapse.hist05, time.lapse.hist07,
-             ncol=2, nrow=1, left="Frequency (%)", bottom="")
+pdf("barplot-missing.pdf", width=11.69, height=8.27)
+grid.arrange(workclass.missing, occupation.missing,
+             ncol=1, nrow=2, left="Frequency (%)", bottom="")
+dev.off()
