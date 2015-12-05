@@ -154,7 +154,7 @@ PreProcessAdult <- function(train,test,imp.method="none",scale.method=2){
     }
   }
   
-  return(list("train.features"=train.impute,
+  return(list("train.features"=subset(train.impute, select=-c(native.country.Holand.Netherlands)), # make sure no. features same
               "train.labels"=train$label,
               "test.features"=test.impute,
               "test.labels"=test$label))
