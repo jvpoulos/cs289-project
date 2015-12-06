@@ -15,6 +15,11 @@
 
 \cvprfinalcopy % *** Uncomment this line for the final submission
 
+\usepackage{footmisc} % Daggers for author notes
+\DefineFNsymbols{mySymbols}{{\ensuremath\dagger}{\ensuremath\ddagger}\S\P
+   *{**}{\ensuremath{\dagger\dagger}}{\ensuremath{\ddagger\ddagger}}}
+\setfnsymbol{mySymbols}
+
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
 \setcounter{page}{1}
@@ -22,7 +27,7 @@
 
 %%%%%%%%% TITLE
 \title{Methods for handling missing and categorical data for classification with neural
-networks}
+networks$^\star$}
 
 \author{
     Jason Poulos\thanks{\href{mailto:poulos@berkeley.edu}{\nolinkurl{poulos@berkeley.edu}}. SID: 24993379.}
@@ -39,7 +44,7 @@ networks}
 Abstract here...
 \end{abstract}
 
-%\footnotetext[1]{Footnote.}
+\footnotetext[1]{The video presentation can be viewed at \url{youtube.com/foo}.}
 
 %\linenumbers
 
