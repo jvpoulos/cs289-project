@@ -4,8 +4,6 @@ import theano
 from theano import tensor as T
 import numpy as np
 #from load import mnist
-#from foxhound.utils.vis import grayscale_grid_vis, unit_scale
-#from scipy.misc import imsave
 
 def floatX(X):
     return np.asarray(X, dtype=theano.config.floatX)
@@ -25,13 +23,14 @@ def model(X, w_h, w_o):
     pyx = T.nnet.softmax(T.dot(h, w_o))
     return pyx
 
-trX, teX, trY, teY = mnist(onehot=True)
+
+#trX, teX, trY, teY = mnist(onehot=True) # trX =training, teX=evaluation
 
 X = T.fmatrix()
 Y = T.fmatrix()
 
-w_h = init_weights((784, 625))
-w_o = init_weights((625, 10))
+w_h = init_weights((trX.shape[1], 625))
+w_o = init_weights((625, trY.shape[1]))
 
 py_x = model(X, w_h, w_o)
 y_x = T.argmax(py_x, axis=1)
@@ -44,7 +43,7 @@ train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_inpu
 predict = theano.function(inputs=[X], outputs=y_x, allow_input_downcast=True)
 
 for i in range(100):
-    for start, end in zip(range(0, len(trX), 128), range(128, len(trX), 128)):
+    for start, end in zip(range(0, len(trX), 128), range(128, len(trX), 128)): # size of batch
         cost = train(trX[start:end], trY[start:end])
     print np.mean(np.argmax(teY, axis=1) == predict(teX))
 
