@@ -1,4 +1,5 @@
 # Code adapted from https://github.com/Newmu/Theano-Tutorials
+from itertools import product
 import theano
 import pydot
 from theano import tensor as T
@@ -31,12 +32,24 @@ def model(X, w_h, w_o):
 # Network topology
 n_inputs = x_train.shape[1]
 n_outputs = len(np.unique(y_train))
+
+# training parameters
 alphas = np.arange(1, 11) # arbitrary scaling factor usually 2-10
+gammas = np.power(10.0, np.arange(-1, -5, -1))
+batch_sizes = np.power(2, np.arange(4,14))
 
 # dictionary to store results
 results_dict = {}
 
-for alpha in alphas:
+params_matrix = np.array([x for x in product(alphas, gammas, batch_sizes)])
+params_matrix = np.column_stack((params_matrix,
+                                 np.zeros(params_matrix.shape[0]),
+                                 np.zeros(params_matrix.shape[0])))
+
+for param_idx in xrange(params_matrix.shape[0]):
+    alpha = params_matrix[param_idx, 0]
+    gamma = params_matrix[param_idx, 1]
+    batch_size = int(params_matrix[param_idx, 2])
     n_hidden = (x_train.shape[0])/(alpha*(n_inputs+n_outputs))
 
     # Initialize weights
@@ -52,39 +65,37 @@ for alpha in alphas:
 
     cost = T.mean(T.nnet.categorical_crossentropy(py_x, Y))
     params = [w_h, w_o]
-    gammas = np.power(10.0, np.arange(-1, -5, -1))
 
-    for gamma in gammas:
-        batch_sizes = np.power(2, np.arange(4,14))
-        for batch_size in batch_sizes:
-            model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
-                                                                gamma,
-                                                                batch_size)
-            updates = sgd(cost, params, gamma=gamma)
+    model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
+                                                        gamma,
+                                                        batch_size)
+    updates = sgd(cost, params, gamma=gamma)
 
-            train = theano.function(inputs=[X, Y],
-                                    outputs=cost,
-                                    updates=updates,
-                                    allow_input_downcast=True)
+    train = theano.function(inputs=[X, Y],
+                            outputs=cost,
+                            updates=updates,
+                            allow_input_downcast=True)
 
-            # Draw graph
-            theano.printing.pydotprint(train,
-                                       outfile="nnet_train"+model_str+".png",
-                                       var_with_name_simple=True)
+    # Draw graph
+    theano.printing.pydotprint(train,
+                               outfile="nnet_train"+model_str+".png",
+                               var_with_name_simple=True)
 
-            predict = theano.function(inputs=[X],
-                                      outputs=y_x,
-                                      allow_input_downcast=True)
+    predict = theano.function(inputs=[X],
+                              outputs=y_x,
+                              allow_input_downcast=True)
 
-            # Test on validation set
-            max_epoch = 10
-            print model_str
-            for i in range(max_epoch):
-                for start, end in zip(range(0, len(x_train), batch_size),
-                                      range(batch_size, len(x_train), batch_size)):
-                    test_cost = train(x_train[start:end], y_train[start:end])
-                error_rate = 1 - np.mean(np.argmax(y_test, axis=1) == predict(x_test))
-                print 'epoch {}, error rate {}, cost {}'.format(i,
-                                                                error_rate,
-                                                                test_cost)
-            results_dict[model_str] = (error_rate, cost)
+    # Test on validation set
+    max_epoch = 10
+    print model_str
+    for i in range(max_epoch):
+        for start, end in zip(range(0, len(x_train), batch_size),
+                              range(batch_size, len(x_train), batch_size)):
+            test_cost = train(x_train[start:end], y_train[start:end])
+        error_rate = 1 - np.mean(np.argmax(y_test, axis=1) == predict(x_test))
+        print 'epoch {}, error rate {}, cost {}'.format(i,
+                                                        error_rate,
+                                                        test_cost)
+    params_matrix[param_idx, 3] = error_rate
+    params_matrix[param_idx, 4] = test_cost
+    print params_matrix[param_idx]
