@@ -11,3 +11,7 @@ labels_train = labels_train[:,1:][:,0] # remove index column
 
 # split to obtain train and test set
 x_train, x_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.33)
+
+# binarize y_train, y_test
+y_train = np.eye(2)[y_train.astype(int)]
+y_test = np.eye(2)[y_test.astype(int)]
