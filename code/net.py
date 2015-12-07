@@ -3,6 +3,9 @@ import theano
 from theano import tensor as T
 import numpy as np
 execfile("load_data.py") # load training and validation sets
+#from load import mnist
+
+#x_train, x_test, y_train, y_test = mnist(onehot=True)
 
 def set_trace():
     from IPython.core.debugger import Pdb
@@ -53,10 +56,9 @@ predict = theano.function(inputs=[X], outputs=y_x, allow_input_downcast=True)
 
 # Test on validation set
 n_batches = 128
-max_epoch = 100
+max_epoch = 10
 
 for i in range(max_epoch):
     for start, end in zip(range(0, len(x_train), n_batches), range(n_batches, len(x_train), n_batches)):
-        print x_train[start:end]
         cost = train(x_train[start:end], y_train[start:end])
-    print np.mean(np.argmax(y_test, axis=1) == predict(x_test))
+    print 'epoch {}, accuracy {}, cost {}'.format(i, np.mean(np.argmax(y_test, axis=1) == predict(x_test)), cost)
