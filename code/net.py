@@ -76,17 +76,17 @@ for param_idx in xrange(params_matrix.shape[0]):
                             updates=updates,
                             allow_input_downcast=True)
 
-    # Draw graph
-    theano.printing.pydotprint(train,
-                               outfile="nnet_train"+model_str+".png",
-                               var_with_name_simple=True)
-
     predict = theano.function(inputs=[X],
                               outputs=y_x,
                               allow_input_downcast=True)
 
+    # Draw graph
+    # theano.printing.pydotprint(predict,
+    #                            outfile="nnet_predict_"+model_str+".png",
+    #                            var_with_name_simple=True)
+
     # Test on validation set
-    max_epoch = 10
+    max_epoch = 2
     print model_str
     for i in range(max_epoch):
         for start, end in zip(range(0, len(x_train), batch_size),
@@ -99,3 +99,6 @@ for param_idx in xrange(params_matrix.shape[0]):
     params_matrix[param_idx, 3] = error_rate
     params_matrix[param_idx, 4] = test_cost
     print params_matrix[param_idx]
+
+# save params matrix to disk
+params_matrix.dump('net_results.np')
