@@ -1,9 +1,13 @@
 # Code adapted from https://github.com/Newmu/Theano-Tutorials
-
 import theano
 from theano import tensor as T
 import numpy as np
 execfile("load_data.py") # load training and validation sets
+
+def set_trace():
+    from IPython.core.debugger import Pdb
+    import sys
+    Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
 
 def floatX(X):
     return np.asarray(X, dtype=theano.config.floatX)
