@@ -1,11 +1,9 @@
 # Code adapted from https://github.com/Newmu/Theano-Tutorials
 import theano
+import pydot
 from theano import tensor as T
 import numpy as np
 execfile("load_data.py") # load training and validation sets
-#from load import mnist
-
-#x_train, x_test, y_train, y_test = mnist(onehot=True)
 
 def set_trace():
     from IPython.core.debugger import Pdb
@@ -49,16 +47,20 @@ y_x = T.argmax(py_x, axis=1)
 
 cost = T.mean(T.nnet.categorical_crossentropy(py_x, Y))
 params = [w_h, w_o]
-updates = sgd(cost, params, gamma=10 ** -2)
+gamma =10 ** -1 # set learning rate
+updates = sgd(cost, params, gamma)
 
 train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
 predict = theano.function(inputs=[X], outputs=y_x, allow_input_downcast=True)
 
+# Draw graph
+theano.printing.pydotprint(train, outfile="nnet_train.png", var_with_name_simple=True)
+
 # Test on validation set
 n_batches = 128
-max_epoch = 10
+max_epoch = 1000
 
 for i in range(max_epoch):
     for start, end in zip(range(0, len(x_train), n_batches), range(n_batches, len(x_train), n_batches)):
         cost = train(x_train[start:end], y_train[start:end])
-    print 'epoch {}, accuracy {}, cost {}'.format(i, np.mean(np.argmax(y_test, axis=1) == predict(x_test)), cost)
+    print 'epoch {}, error {}, cost {}'.format(i, (1-np.mean(np.argmax(y_test, axis=1) == predict(x_test))), cost)
