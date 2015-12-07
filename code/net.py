@@ -69,7 +69,7 @@ for alpha in alphas:
 
             # Draw graph
             theano.printing.pydotprint(train,
-                                       outfile="nnet_train.png",
+                                       outfile="nnet_train"+model_str+".png",
                                        var_with_name_simple=True)
 
             predict = theano.function(inputs=[X],
@@ -88,13 +88,3 @@ for alpha in alphas:
                                                                 error_rate,
                                                                 test_cost)
             results_dict[model_str] = (error_rate, cost)
-
-# Test on validation set
-n_batches = 128
-max_epoch = 1000
-
-for i in range(max_epoch):
-    for start, end in zip(range(0, len(x_train), n_batches), range(n_batches, len(x_train), n_batches)):
-        cost = train(x_train[start:end], y_train[start:end])
-    print 'epoch {}, error {}, cost {}'.format(i, (1-np.mean(np.argmax(y_test, axis=1) == predict(x_test))), cost)
->>>>>>> dc1543396d6a48e2e60a968e022510af12ef4278
