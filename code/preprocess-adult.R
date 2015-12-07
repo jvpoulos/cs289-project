@@ -1,10 +1,13 @@
 # Preprocess adult dataset
 
 # Libraries
-# require(devtools) # we can add fancier methods later
-# devtools::install_github("jeffwong/imputation") # import imputation methods
-# require(imputation)
+require(devtools) 
+devtools::install_github("jeffwong/imputation") # import imputation methods
+require(imputation)
 require(caret)
+require(matrixStats)
+
+# notes: use median and mean for KNN
 
 # Load data from UCI repository
 adult.train <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
@@ -28,7 +31,8 @@ PreProcessAdult <- function(train,test,imp.method="none",scale.method=2){
   # Args:
   #   train: Dataframe of training features and response.
   #   test: Dataframe of test features and response. 
-  #   imp.method: Method for data imputation. Options are "mean", "median", or "none". Default is "none".
+  #   imp.method: Method for data imputation.
+  #     Options are: "mean", "median", "gbm", "knn.mean", "knn.median", "lm", "svd", "svt", or "none". Default is "none".
   #   scale.method:  1: Mean 0 and standard deviation 1; or 2: Midrange 0 and range 2 (i.e., minimum -1 and maximum 1). Default is 2.
   #
   # Returns:
@@ -89,17 +93,38 @@ PreProcessAdult <- function(train,test,imp.method="none",scale.method=2){
   }
   
   if(imp.method=="mean"){
-    mean.train <- sapply(colnames(train.bin), function(x){
-      mean(train.bin[,x], na.rm=TRUE)
-    })
-    train.impute <- train.bin
-    for(x in 1:ncol(train.bin)){
-      train.bin[,x][is.na(train.bin[,x])] <- mean.train[x]
+    train.impute <- meanImpute(train.bin)
+    test.impute <- meanImpute(test.bin)
+  }
+  if(imp.method=="gbm"){
+    train.impute <- gbmImpute(train.bin)
+    test.impute <- gbmImpute(test.bin)
+  }
+  if(imp.method=="knn.mean"){
+    train.impute <- kNNImpute(train.bin)
+    test.impute <- kNNImpute(test.bin)
+  }
+  if(imp.method=="knn.median"){
+    impute.fn <- function(scores, distances, raw_dist) {
+      knn.values <- scores[c(as.integer(names(distances)))]
+      knn.weights <- 1 - (distances / max(raw_dist))
+      return(matrixStats::weightedMedian(knn.values, knn.weights))
     }
-    test.impute <- test.bin
-    for(x in 1:ncol(test.bin)){
-      test.bin[,x][is.na(test.bin[,x])] <- mean.train[x] # use train mean to impute test set
-    }
+    
+    train.impute <- kNNImpute(train.bin, impute.fn)
+    test.impute <- kNNImpute(test.bin, impute.fn)
+  }
+  if(imp.method=="lm"){
+    train.impute <- lmImpute(train.bin)
+    test.impute <- lmImpute(test.bin)
+  }
+  if(imp.method=="svd"){
+    train.impute <- SVDImpute(train.bin, k=3)
+    test.impute <- SVDImpute(test.bin, k=3)
+  }
+  if(imp.method=="svt"){
+    train.impute <- SVTImpute(train.bin)
+    test.impute <- SVTImpute(test.bin)
   }
   else{
     train.impute <- train.bin
@@ -176,3 +201,8 @@ adult.pre.median <- PreProcessAdult(adult.train, adult.test, imp.method="median"
 write.table(adult.pre.median[["train.features"]],"adult-train-features-median.csv")
 write.table(adult.pre.median[["test.features"]],"adult-test-features-median.csv")
 
+# SVD
+adult.pre.svd <- PreProcessAdult(adult.train, adult.test, imp.method="svd") 
+
+write.table(adult.pre.svd[["train.features"]],"adult-train-features-svd.csv")
+write.table(adult.pre.svd[["test.features"]],"adult-test-features-svd.csv")
