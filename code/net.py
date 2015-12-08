@@ -54,7 +54,7 @@ for param_idx in xrange(params_matrix.shape[0]):
 
     # Initialize weights
     w_h = init_weights((n_inputs, n_hidden))
-    w_o = init_weights((n_inputs, n_hidden))
+    w_o = init_weights((n_hidden, n_outputs))
 
     # Initialize NN classifier
     X = T.fmatrix()
@@ -86,7 +86,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
                                                         gamma,
                                                         batch_size)
-    max_epoch = 10
+    max_epoch = 2
     print model_str
     for i in range(max_epoch):
         for start, end in zip(range(0, len(x_train), batch_size),
