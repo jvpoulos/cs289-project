@@ -35,7 +35,7 @@ def RMSprop(cost, params, gamma, rho=0.9, epsilon=1e-6):
         gradient_scaling = T.sqrt(acc_new + epsilon)
         g = g / gradient_scaling
         updates.append((acc, acc_new))
-        updates.append((p, p - lr * g))
+        updates.append((p, p - gamma * g))
     return updates
 
 def dropout(X, p=0.):
@@ -83,7 +83,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     # Initialize weights
     w_h = init_weights((n_inputs, n_hidden))
     w_h2 = init_weights((n_hidden, n_hidden))
-    w_o = init_weights((n_inputs, n_hidden))
+    w_o = init_weights((n_hidden, n_outputs))
     
     # Initialize NN classifier
     X = T.fmatrix()
@@ -95,7 +95,7 @@ for param_idx in xrange(params_matrix.shape[0]):
 
     cost = T.mean(T.nnet.categorical_crossentropy(noise_py_x, Y))
     params = [w_h, w_h2, w_o]
-    updates = RMSprop(cost, params, lr=0.001)
+    updates = RMSprop(cost, params, gamma=0.001)
 
     train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
     predict = theano.function(inputs=[X], outputs=y_x, allow_input_downcast=True)
@@ -104,7 +104,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
                                                         gamma,
                                                         batch_size)
-    max_epoch = 10
+    max_epoch = 2
     print model_str
     for i in range(max_epoch):
         for start, end in zip(range(0, len(x_train), batch_size),
