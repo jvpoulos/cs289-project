@@ -1,7 +1,7 @@
 # Code adapted from https://github.com/Newmu/Theano-Tutorials
 from itertools import product
 import theano
-import pydot
+#import pydot
 from theano import tensor as T
 import numpy as np
 execfile("load_data.py") # load training and validation sets
@@ -54,7 +54,7 @@ for param_idx in xrange(params_matrix.shape[0]):
 
     # Initialize weights
     w_h = init_weights((n_inputs, n_hidden))
-    w_o = init_weights((n_hidden, n_outputs))
+    w_o = init_weights((n_inputs, n_hidden))
 
     # Initialize NN classifier
     X = T.fmatrix()
@@ -66,9 +66,6 @@ for param_idx in xrange(params_matrix.shape[0]):
     cost = T.mean(T.nnet.categorical_crossentropy(py_x, Y))
     params = [w_h, w_o]
 
-    model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
-                                                        gamma,
-                                                        batch_size)
     updates = sgd(cost, params, gamma=gamma)
 
     train = theano.function(inputs=[X, Y],
@@ -86,7 +83,10 @@ for param_idx in xrange(params_matrix.shape[0]):
     #                            var_with_name_simple=True)
 
     # Test on validation set
-    max_epoch = 2
+    model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
+                                                        gamma,
+                                                        batch_size)
+    max_epoch = 10
     print model_str
     for i in range(max_epoch):
         for start, end in zip(range(0, len(x_train), batch_size),
