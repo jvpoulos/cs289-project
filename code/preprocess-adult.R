@@ -91,11 +91,21 @@ PreProcessAdult <- function(train,test,imp.method="none",scale.method=2){
       test.bin[,x][is.na(test.bin[,x])] <- median.train[x] # use train median to impute test set
     }
   }
-  
+
   if(imp.method=="mean"){
-    train.impute <- meanImpute(train.bin)
-    test.impute <- meanImpute(test.bin)
+    mean.train <- sapply(colnames(train.bin), function(x){
+      mean(train.bin[,x], na.rm=TRUE)
+    })
+    train.impute <- train.bin
+    for(x in 1:ncol(train.bin)){
+      train.bin[,x][is.na(train.bin[,x])] <- mean.train[x]
+    }
+    test.impute <- test.bin
+    for(x in 1:ncol(test.bin)){
+      test.bin[,x][is.na(test.bin[,x])] <- mean.train[x] # use train mean to impute test set
+    }
   }
+  
   if(imp.method=="gbm"){
     train.impute <- gbmImpute(train.bin)
     test.impute <- gbmImpute(test.bin)
@@ -201,8 +211,8 @@ adult.pre.median <- PreProcessAdult(adult.train, adult.test, imp.method="median"
 write.table(adult.pre.median[["train.features"]],"adult-train-features-median.csv")
 write.table(adult.pre.median[["test.features"]],"adult-test-features-median.csv")
 
-# SVD
-adult.pre.svd <- PreProcessAdult(adult.train, adult.test, imp.method="svd") 
+# Mean imputation
+adult.pre.mean <- PreProcessAdult(adult.train, adult.test, imp.method="mean") 
 
-write.table(adult.pre.svd[["train.features"]],"adult-train-features-svd.csv")
-write.table(adult.pre.svd[["test.features"]],"adult-test-features-svd.csv")
+write.table(adult.pre.mean[["train.features"]],"adult-train-features-mean.csv")
+write.table(adult.pre.mean[["test.features"]],"adult-test-features-median.csv")

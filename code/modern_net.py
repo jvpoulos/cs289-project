@@ -57,9 +57,6 @@ def model(X, w_h, w_h2, w_o, p_drop_input, p_drop_hidden):
 # Load training and test sets
 execfile("load_data.py")
 
-# Split training set to train (75%) and validation (25%) sets
-x_train, x_val, y_train, y_val = train_test_split(features_train, labels_train, train_size=0.75)
-
 # Network topology
 n_inputs = x_train.shape[1]
 n_outputs = len(np.unique(y_train))

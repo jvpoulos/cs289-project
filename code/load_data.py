@@ -18,7 +18,4 @@ labels = np.eye(2)[labels.astype(int)]
 #labels_test = np.eye(2)[labels_test.astype(int)]
 
 # Split to obtain train and test set
-features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.33, random_state=42)
-
-# Split training set to train (75%) and validation (25%) sets
-x_train, x_val, y_train, y_val = train_test_split(features_train, labels_train, train_size=0.75, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.33, random_state=42)
