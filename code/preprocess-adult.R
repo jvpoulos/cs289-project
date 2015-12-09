@@ -199,11 +199,11 @@ PreProcessAdult <- function(train,test,imp.method="none",scale.method=2){
 # No imputation
 adult.pre <- PreProcessAdult(adult.train, adult.test, imp.method="none") 
 
-write.table(adult.pre[["train.labels"]],"adult-train-labels.csv") 
-write.table(adult.pre[["test.labels"]],"adult-test-labels.csv")
+write.table(adult.pre[["train.labels"]],"adult-train-labels.csv", quote=FALSE) 
+write.table(adult.pre[["test.labels"]],"adult-test-labels.csv",quote=FALSE)
 
-write.table(adult.pre[["train.features"]],"adult-train-features.csv")
-write.table(adult.pre[["test.features"]],"adult-test-features.csv")
+write.table(adult.pre[["train.features"]],"adult-train-features-none.csv")
+write.table(adult.pre[["test.features"]],"adult-test-features-none.csv")
 
 # Median imputation
 adult.pre.median <- PreProcessAdult(adult.train, adult.test, imp.method="median") 

@@ -1,7 +1,6 @@
 # Code adapted from https://github.com/Newmu/Theano-Tutorials
 from itertools import product
 import theano
-# import pydot
 from theano import tensor as T
 import numpy as np
 from sklearn.cross_validation import KFold
@@ -37,7 +36,6 @@ def model(X, w_h, w_o):
 
 # Load training and test sets
 execfile("load_data.py")
-
 
 # cross-validation parameters
 n_folds = 10
@@ -90,10 +88,6 @@ for param_idx in xrange(params_matrix.shape[0]):
                               outputs=y_x,
                               allow_input_downcast=True)
 
-    # Draw graph
-    # theano.printing.pydotprint(predict,
-    #                            outfile="nnet_predict_"+model_str+".png",
-    #                            var_with_name_simple=True)
 
     # Test on validation set
     model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
@@ -119,7 +113,7 @@ for param_idx in xrange(params_matrix.shape[0]):
             error_rate = 1 - np.mean(np.argmax(y_train[val_idx], axis=1) ==
                                                predict(x_train[val_idx]))
 
-            print 'fold {}, epoch {}, error rate {}, cost {}'.format(fold, i,
+            print 'fold {}, epoch {}, error rate {}, cost {}'.format(fold, i+1,
                                                             error_rate,
                                                             test_cost)
         error_rates.append(error_rate)
