@@ -58,16 +58,19 @@ def model(X, w_h, w_h2, w_o, p_drop_input, p_drop_hidden):
 # Load training and test sets
 execfile("load_data.py")
 
+# Cross-validation parameters
+n_folds = 3
+
 # Network topology
 n_inputs = x_train.shape[1]
 n_outputs = len(np.unique(y_train))
 
-# training parameters
+# Training parameters
 alphas = np.arange(1, 11) # arbitrary scaling factor usually 2-10
 gammas = np.power(10.0, np.arange(-1, -5, -1))
 batch_sizes = np.power(2, np.arange(4,14))
 
-# dictionary to store results
+# Dictionary to store results
 results_dict = {}
 
 params_matrix = np.array([x for x in product(alphas, gammas, batch_sizes)])
@@ -79,7 +82,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     alpha = params_matrix[param_idx, 0]
     gamma = params_matrix[param_idx, 1]
     batch_size = int(params_matrix[param_idx, 2])
-    n_hidden = (x_train.shape[0])/(alpha*(n_inputs+n_outputs))
+    n_hidden = (x_train.shape[0] / n_folds)/(alpha*(n_inputs+n_outputs))
     
     # Initialize weights
     w_h = init_weights((n_inputs, n_hidden))
@@ -136,5 +139,5 @@ for param_idx in xrange(params_matrix.shape[0]):
     params_matrix[param_idx, 4] = np.mean(test_cost)
     print params_matrix[param_idx]
 
-# save params matrix to disk
+# Save params matrix to disk
 params_matrix.dump('modern_net_results.np')
