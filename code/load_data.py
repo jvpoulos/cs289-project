@@ -2,16 +2,20 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 
 # Load train data
-# train, load from csv without headers
-features_train = np.genfromtxt('../adult-dataset/adult-train-features-median.csv', delimiter=' ', skip_header=1)
-features_train = features_train[:,1:] # remove index column
+features = np.genfromtxt('../adult-dataset/adult-train-features-median.csv',
+                         delimiter=' ',
+                         skip_header=1) # train, load from csv without headers
+features = features[:,1:] # remove index column
 
-labels_train = np.genfromtxt('../adult-dataset/adult-train-labels.csv', delimiter=' ', skip_header=1) # need to remove quotes
-labels_train = labels_train[:,1:][:,0] # remove index column
+labels = np.genfromtxt('../adult-dataset/adult-train-labels.csv',
+                       delimiter=' ',
+                       skip_header=1) # need to remove quotes
 
-# split to obtain train and test set
-x_train, x_test, y_train, y_test = train_test_split(features_train, labels_train, test_size=0.33)
+labels= labels[:,1:][:,0] # remove index column
 
-# binarize y_train, y_test
-y_train = np.eye(2)[y_train.astype(int)]
-y_test = np.eye(2)[y_test.astype(int)]
+# Split to obtain train and test set
+features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.33)
+
+# Binarize labels
+labels_train = np.eye(2)[labels_train.astype(int)]
+labels_test = np.eye(2)[labels_test.astype(int)]

@@ -4,7 +4,6 @@ import theano
 #import pydot
 from theano import tensor as T
 import numpy as np
-execfile("load_data.py") # load training and validation sets
 
 def set_trace():
     from IPython.core.debugger import Pdb
@@ -28,6 +27,12 @@ def model(X, w_h, w_o):
     h = T.nnet.sigmoid(T.dot(X, w_h))
     pyx = T.nnet.softmax(T.dot(h, w_o))
     return pyx
+
+# Load training and test sets
+execfile("load_data.py")
+
+# Split training set to train (75%) and validation (25%) sets
+x_train, x_val, y_train, y_val = train_test_split(features_train, labels_train, train_size=0.75)
 
 # Network topology
 n_inputs = x_train.shape[1]
@@ -92,7 +97,7 @@ for param_idx in xrange(params_matrix.shape[0]):
         for start, end in zip(range(0, len(x_train), batch_size),
                               range(batch_size, len(x_train), batch_size)):
             test_cost = train(x_train[start:end], y_train[start:end])
-        error_rate = 1 - np.mean(np.argmax(y_test, axis=1) == predict(x_test))
+        error_rate = 1 - np.mean(np.argmax(y_val, axis=1) == predict(x_val))
         print 'epoch {}, error rate {}, cost {}'.format(i,
                                                         error_rate,
                                                         test_cost)
