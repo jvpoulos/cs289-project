@@ -1,20 +1,25 @@
 # Code adapted from https://github.com/Newmu/Theano-Tutorials
 from itertools import product
 import theano
-#import pydot
+# import pydot
 from theano import tensor as T
 import numpy as np
+from sklearn.cross_validation import KFold
+
 
 def set_trace():
     from IPython.core.debugger import Pdb
     import sys
     Pdb(color_scheme='Linux').set_trace(sys._getframe().f_back)
 
+
 def floatX(X):
     return np.asarray(X, dtype=theano.config.floatX)
 
+
 def init_weights(shape):
     return theano.shared(floatX(np.random.randn(*shape) * 0.01))
+
 
 def sgd(cost, params, gamma):
     grads = T.grad(cost=cost, wrt=params)
@@ -23,16 +28,19 @@ def sgd(cost, params, gamma):
         updates.append([p, p - g * gamma])
     return updates
 
+
 def model(X, w_h, w_o):
     h = T.nnet.sigmoid(T.dot(X, w_h))
     pyx = T.nnet.softmax(T.dot(h, w_o))
     return pyx
 
+
 # Load training and test sets
 execfile("load_data.py")
 
-# Split training set to train (75%) and validation (25%) sets
-x_train, x_val, y_train, y_val = train_test_split(features_train, labels_train, train_size=0.75)
+
+# cross-validation parameters
+n_folds = 10
 
 # Network topology
 n_inputs = x_train.shape[1]
@@ -55,7 +63,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     alpha = params_matrix[param_idx, 0]
     gamma = params_matrix[param_idx, 1]
     batch_size = int(params_matrix[param_idx, 2])
-    n_hidden = (x_train.shape[0])/(alpha*(n_inputs+n_outputs))
+    n_hidden = (x_train.shape[0] / n_folds)/(alpha*(n_inputs+n_outputs))
 
     # Initialize weights
     w_h = init_weights((n_inputs, n_hidden))
@@ -93,16 +101,33 @@ for param_idx in xrange(params_matrix.shape[0]):
                                                         batch_size)
     max_epoch = 2
     print model_str
-    for i in range(max_epoch):
-        for start, end in zip(range(0, len(x_train), batch_size),
-                              range(batch_size, len(x_train), batch_size)):
-            test_cost = train(x_train[start:end], y_train[start:end])
-        error_rate = 1 - np.mean(np.argmax(y_val, axis=1) == predict(x_val))
-        print 'epoch {}, error rate {}, cost {}'.format(i,
-                                                        error_rate,
-                                                        test_cost)
-    params_matrix[param_idx, 3] = error_rate
-    params_matrix[param_idx, 4] = test_cost
+
+    kf = KFold(x_train.shape[0], n_folds=n_folds)
+    error_rates = []
+    test_costs = []
+
+    fold = 1
+    for train_idx, val_idx in kf:
+        for i in range(max_epoch):
+            for start, end in zip(range(0, len(x_train[train_idx]),
+                                  batch_size),
+                                  range(batch_size, len(x_train[train_idx]),
+                                  batch_size)):
+                test_cost = train(x_train[train_idx][start:end],
+                                  y_train[train_idx][start:end])
+
+            error_rate = 1 - np.mean(np.argmax(y_train[val_idx], axis=1) ==
+                                               predict(x_train[val_idx]))
+
+            print 'fold {}, epoch {}, error rate {}, cost {}'.format(fold, i,
+                                                            error_rate,
+                                                            test_cost)
+        error_rates.append(error_rate)
+        test_costs.append(test_cost)
+        fold += 1
+
+    params_matrix[param_idx, 3] = np.mean(error_rate)
+    params_matrix[param_idx, 4] = np.mean(test_cost)
     print params_matrix[param_idx]
 
 # save params matrix to disk
