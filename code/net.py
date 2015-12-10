@@ -42,7 +42,7 @@ n_inputs = x_train.shape[1]
 n_outputs = len(np.unique(y_train))
 
 # Training parameters
-alphas = (1,4,9)) # arbitrary scaling factor usually 2-10
+alphas = (1,4,9) # arbitrary scaling factor usually 2-10
 gammas = np.power(10.0, np.arange(-1, -3, -1))
 batch_sizes = (32, 512, 4096)
 
