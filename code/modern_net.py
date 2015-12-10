@@ -114,6 +114,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     kf = KFold(x_train.shape[0], n_folds=n_folds)
     error_rates = []
     test_costs = []
+    running_time = []
     
     fold = 1
     for train_idx, val_idx in kf:
