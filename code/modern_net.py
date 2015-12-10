@@ -57,7 +57,7 @@ def model(X, w_h, w_h2, w_o, p_drop_input, p_drop_hidden):
     return h, h2, py_x
 
 # Cross-validation parameters
-n_folds = 10
+n_folds = 3
 
 # Network topology
 n_inputs = x_train.shape[1]
