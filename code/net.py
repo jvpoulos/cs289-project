@@ -35,7 +35,7 @@ def model(X, w_h, w_o):
     return pyx
 
 # Cross-validation parameters
-n_folds = 2
+n_folds = 10
 
 # Network topology
 n_inputs = x_train.shape[1]
@@ -92,7 +92,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
                                                         gamma,
                                                         batch_size)
-    max_epoch = 1
+    max_epoch = 100
     print model_str
 
     kf = KFold(x_train.shape[0], n_folds=n_folds)
