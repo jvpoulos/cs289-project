@@ -64,9 +64,9 @@ n_inputs = x_train.shape[1]
 n_outputs = len(np.unique(y_train))
 
 # Training parameters
-alphas = np.arange(1, 11) # arbitrary scaling factor usually 2-10
-gammas = np.power(10.0, np.arange(-1, -5, -1))
-batch_sizes = np.power(2, np.arange(4,14))
+alphas = (1,4,9)) # arbitrary scaling factor usually 2-10
+gammas = np.power(10.0, np.arange(-1, -3, -1))
+batch_sizes = (32, 512, 4096)
 
 # Dictionary to store results
 results_dict = {}
@@ -108,7 +108,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
                                                         gamma,
                                                         batch_size)
-    max_epoch = 100
+    max_epoch = 50
     print model_str
 
     kf = KFold(x_train.shape[0], n_folds=n_folds)
