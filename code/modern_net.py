@@ -5,6 +5,7 @@ from theano import tensor as T
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 import numpy as np
 from sklearn.cross_validation import KFold
+import time
 
 def set_trace():
     from IPython.core.debugger import Pdb
@@ -55,11 +56,8 @@ def model(X, w_h, w_h2, w_o, p_drop_input, p_drop_hidden):
     py_x = softmax(T.dot(h2, w_o))
     return h, h2, py_x
 
-# Load training and test sets
-execfile("load_data.py")
-
 # Cross-validation parameters
-n_folds = 3
+n_folds = 10
 
 # Network topology
 n_inputs = x_train.shape[1]
@@ -76,8 +74,10 @@ results_dict = {}
 params_matrix = np.array([x for x in product(alphas, gammas, batch_sizes)])
 params_matrix = np.column_stack((params_matrix,
                                  np.zeros(params_matrix.shape[0]),
+                                 np.zeros(params_matrix.shape[0]),
                                  np.zeros(params_matrix.shape[0])))
 
+start = time.time()
 for param_idx in xrange(params_matrix.shape[0]):
     alpha = params_matrix[param_idx, 0]
     gamma = params_matrix[param_idx, 1]
@@ -108,7 +108,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     model_str = 'alpha {} gamma {} batchsize {}'.format(alpha,
                                                         gamma,
                                                         batch_size)
-    max_epoch = 2
+    max_epoch = 100
     print model_str
 
     kf = KFold(x_train.shape[0], n_folds=n_folds)
@@ -133,11 +133,13 @@ for param_idx in xrange(params_matrix.shape[0]):
                                                                      test_cost)
         error_rates.append(error_rate)
         test_costs.append(test_cost)
+        running_time.append(np.around((time.time() - start) / 60., 1))
         fold += 1
     
     params_matrix[param_idx, 3] = np.mean(error_rate)
     params_matrix[param_idx, 4] = np.mean(test_cost)
+    params_matrix[param_idx, 5] = np.mean(running_time)
     print params_matrix[param_idx]
 
 # Save params matrix to disk
-params_matrix.dump('modern_net_results.np')
+params_matrix.dump('modern_net_results_' +str(imp_method) + '.np')
