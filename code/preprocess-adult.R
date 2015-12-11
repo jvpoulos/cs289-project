@@ -215,4 +215,4 @@ write.table(adult.pre.median[["test.features"]],"adult-test-features-median.csv"
 adult.pre.mean <- PreProcessAdult(adult.train, adult.test, imp.method="mean") 
 
 write.table(adult.pre.mean[["train.features"]],"adult-train-features-mean.csv")
-write.table(adult.pre.mean[["test.features"]],"adult-test-features-median.csv")
+write.table(adult.pre.mean[["test.features"]],"adult-test-features-mean.csv")

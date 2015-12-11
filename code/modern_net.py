@@ -64,7 +64,7 @@ n_inputs = x_train.shape[1]
 n_outputs = len(np.unique(y_train))
 
 # Training parameters
-alphas = (1,4,9)) # arbitrary scaling factor usually 2-10
+alphas = (1,4,9) # arbitrary scaling factor usually 2-10
 gammas = np.power(10.0, np.arange(-1, -3, -1))
 batch_sizes = (32, 512, 4096)
 
@@ -77,7 +77,6 @@ params_matrix = np.column_stack((params_matrix,
                                  np.zeros(params_matrix.shape[0]),
                                  np.zeros(params_matrix.shape[0])))
 
-start = time.time()
 for param_idx in xrange(params_matrix.shape[0]):
     alpha = params_matrix[param_idx, 0]
     gamma = params_matrix[param_idx, 1]
@@ -118,6 +117,7 @@ for param_idx in xrange(params_matrix.shape[0]):
     
     fold = 1
     for train_idx, val_idx in kf:
+        start_time = time.time()
         for i in range(max_epoch):
             for start, end in zip(range(0, len(x_train[train_idx]),
                                   batch_size),
@@ -134,7 +134,7 @@ for param_idx in xrange(params_matrix.shape[0]):
                                                                      test_cost)
         error_rates.append(error_rate)
         test_costs.append(test_cost)
-        running_time.append(np.around((time.time() - start) / 60., 1))
+        running_time.append(np.around((time.time() - start_time) / 60., 1))
         fold += 1
     
     params_matrix[param_idx, 3] = np.mean(error_rate)
