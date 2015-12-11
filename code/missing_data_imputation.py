@@ -19,7 +19,6 @@ class Imputer(object):
         Attributes
         ----------
 
-
         """
 
     def drop(self, x, missing_data_cond):
@@ -314,7 +313,7 @@ class Imputer(object):
 
         return data, factor_labels
 
-    def binarize_data(self, x, cols, in_place=False):
+    def binarize_data(self, x, cols, one_minus_one=True, in_place=False):
         """Replace column in cols with one-hot representation of cols
 
         Parameters
@@ -340,8 +339,12 @@ class Imputer(object):
             uniq_vals, indices = np.unique(data[:,col],
                                           return_inverse=True)
 
-            data = np.column_stack((data, np.eye(uniq_vals.shape[0],
-                                                 dtype=int)[indices]))
+            if one_minus_one:
+                data = np.column_stack((data,
+                    (np.eye(uniq_vals.shape[0], dtype=int)[indices] * 2) - 1))
+            else:
+                data = np.column_stack((data, np.eye(uniq_vals.shape[0],
+                                                     dtype=int)[indices]))
 
         # remove columns with categorical variables
         val_cols = [n for n in xrange(data.shape[1]) if n not in cols]
