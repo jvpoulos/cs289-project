@@ -5,11 +5,14 @@ import seaborn as sbn
 from mpl_toolkits.mplot3d import Axes3D
 
 # enumerate results files
-result_files = ('net_results.np',
-                'net_drop_bin_scaled_results.np')
-                'net_replace_bin_scaled_results.np')
-                'net_predicted_bin_scaled_results.np')
-                'net_mode_bin_scaled_results.np')
+result_files = ('net_results_median.np',
+                'modern_net_results_median.np',
+                'net_results_mean.np',
+                'modern_net_results_mean.np',
+                'net_drop_bin_scaled_results.np',
+                'net_replace_bin_scaled_results.np',
+                'net_predicted_bin_scaled_results.np',
+                'net_mode_bin_scaled_results.np',
                 'net_facanal_bin_scaled_results.np')
 
 # plot and save results to png
@@ -43,7 +46,7 @@ for result_filename in result_files:
 
   plt.xlabel('Alpha')
   plt.ylabel('Error rate')
-  plt.savefig('../plots/{}_2d.png'.format(splitext(result_filename)))
+  plt.savefig('./plots/{}_2d.png'.format(splitext(result_filename)))
 
   # 3D plot
   fig = plt.figure()
@@ -64,4 +67,4 @@ for result_filename in result_files:
   ax.set_xlabel('Alpha')
   ax.set_zlabel('Gamma')
   ax.set_ylabel('Error rate')
-  plt.savefig('../plots/{}_3d.png'.format(splitext(result_filename)))
+  plt.savefig('./plots/{}_3d.png'.format(splitext(result_filename)))
