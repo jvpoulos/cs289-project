@@ -164,9 +164,31 @@ Figure \ref{fig:barplot-missing} shows the frequency of observed categories and 
 
 \subsection{Preprocessing}
 
-\subsection{Model assessment}
 
 \subsection{Model selection}
+
+\begin{table*}[htbp]
+\begin{center}
+\begin{tabular}{llllllll}
+\textbf{Imputation method} & \textbf{Model type} & \textbf{$\alpha$} & \textbf{$\gamma$} & \textbf{Batch size} & \textbf{Error rate} & \textbf{Cost} & \textbf{Time (min.)} \\
+\hline
+Drop & Simple & 9 & 0.1 & 32 & 0.1406 & 0.1525 & 3.7 \\
+PCA & Simple & 4 & 0.1 & 32 & 0.1411 & 0.2487 & 8.3667 \\
+Predicted & Simple & 4 & 0.1 & 32 & 0.1413 & 0.2056 & 6.7 \\
+Mode & Simple & 9 & 0.1 & 32 & 0.1415 & 0.1829 & 4.2667 \\
+Replace & Simple & 1 & 0.1 & 32 & 0.1417 & 0.2189 & 6.8 \\
+Median & Simple & 4 & 0.1 & 32 & 0.1446 & 0.1924 & - \\
+Mean & Simple & 4 & 0.1 & 32 & 0.1453 & 0.1915 & - \\
+Mean & Complex & 1 & 0.1 & 32 & 0.1593 & 0.3118 & - \\
+Median & Complex & 1 & 0.01 & 32 & 0.1595 & 0.3564 & - \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Performance of models selected on the basis of cross--validated error rate on the training data. \texttt{Imputation method}is how missing values in the training data are imputed; \texttt{Model type} is the type of neural network classifier used; \texttt{$\alpha$} is the scaling factor used to determine the number of hidden neurons in the neural network; \texttt{$\gamma$} is the learning rate; \texttt{Batch size} is the size of the batch; \texttt{Error rate} is the mean 3-fold cross--validated error rate on the training data;  \texttt{Cost} is the mean cross--entropy cost across folds; \texttt{Time} is the mean computational time across folds. }
+\label{tab:err-rates}
+\end{table*}
+
+\subsection{Model assessment}
 
 \section{Conclusions} \label{section:Con}
 

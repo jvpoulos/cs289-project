@@ -4,6 +4,12 @@ import matplotlib.pylab as plt
 import seaborn as sbn
 from mpl_toolkits.mplot3d import Axes3D
 
+def savetxt_compact(fname, x, fmt="%.6g", delimiter=','):
+    with open(fname, 'w') as fh:
+        for row in x:
+            line = delimiter.join("0" if value == 0 else fmt % value for value in row)
+            fh.write(line + '\n')
+
 # enumerate results files
 result_files = ('net_results_median.np',
                 'modern_net_results_median.np',
@@ -19,7 +25,7 @@ result_files = ('net_results_median.np',
 for result_filename in result_files:
   # load results
   results = np.load(result_filename)
-  np.savetxt('./results/' + str(result_filename) + '_.csv', results)
+  savetxt_compact('./results/' + str(result_filename) + '_.csv', results, fmt='%.4f')
 
   # 2D plot
   g1_indices = np.where(results[:,1] == 0.0001)
@@ -39,10 +45,10 @@ for result_filename in result_files:
                    marker='o', color=colors[3])
 
   plt.legend((g1,g2,g3,g4),
-             (r'$\gamma=0.0001$',r'$\gamma=0.001$',r'$\gamma=0.01$', r'$\gamma=0.1$'),
+             (r'$\gamma=10^{-4}$',r'$\gamma=10^{-3}$',r'$\gamma=10^{-2}$', r'$\gamma=10^{-1}$'),
              scatterpoints=1,
-             loc='upper left',
-             ncol=1,
+             loc='lower left',
+             ncol=4,
              fontsize=8)
 
   plt.xlabel('Alpha')
