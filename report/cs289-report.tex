@@ -148,19 +148,19 @@ Uncovering patterns of missing values in the dataset will help select strategies
 
 Figure \ref{fig:barplot-missing} shows the frequency of observed categories and missing values for \textit{Work class} and \textit{Occupation}. Each stacked column shows the proportion of missing values in the other feature and \textit{Native country} for each category. The plot shows the missing values are not MCAR: individuals working in the private sector, for instance, are more likely to have missing values than those individuals in other work classes. However, missing values tend to be evenly distributed across occupational categories. 
 
-\begin{figure}[htbp] 
+\begin{figure*}[htbp] 
    \centering
-   \includegraphics[width=0.5\textwidth]{./figure/proportion-missing.pdf}
+   \includegraphics[width=0.8\textwidth]{./figure/proportion-missing.pdf}
    \caption{Histogram of proportion of missing values in each feature (Left) of Adult training set and aggregation plot of all existing combinations of missing and non-missing values in the samples (Right).}
    \label{fig:proportion-missing}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[htbp] 
+\begin{figure*}[htbp] 
    \centering
-   \includegraphics[width=0.5\textwidth]{./figure/barplot-missing.pdf}
+   \includegraphics[width=0.8\textwidth]{./figure/barplot-missing.pdf}
    \caption{Barplot of proportion of observed and missing values of \textit{Work class} and \textit{Occupation} in Adult dataset.}
    \label{fig:barplot-missing}
-\end{figure}
+\end{figure*}
 
 \subsection{Preprocessing}
 
