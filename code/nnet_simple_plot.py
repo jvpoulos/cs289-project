@@ -19,6 +19,7 @@ result_files = ('net_results_median.np',
 for result_filename in result_files:
   # load results
   results = np.load(result_filename)
+  np.savetxt('./results/' + str(result_filename) + '_.csv', results)
 
   # 2D plot
   g1_indices = np.where(results[:,1] == 0.0001)
