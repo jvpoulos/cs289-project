@@ -11,15 +11,20 @@ def savetxt_compact(fname, x, fmt="%.6g", delimiter=','):
             fh.write(line + '\n')
 
 # enumerate results files
-result_files = ('net_results_median.np',
-                'modern_net_results_median.np',
-                'net_results_mean.np',
-                'modern_net_results_mean.np',
-                'net_drop_bin_scaled_results.np',
-                'net_replace_bin_scaled_results.np',
-                'net_predicted_bin_scaled_results.np',
-                'net_mode_bin_scaled_results.np',
-                'net_facanal_bin_scaled_results.np')
+result_files = (#'net_results_median.np',
+                #'modern_net_results_median.np',
+                # 'net_results_mean.np',
+                #'modern_net_results_mean.np',
+                #'net_drop_bin_scaled_results.np',
+                'modern_net_drop_bin_scaled_results.np',
+                #'net_replace_bin_scaled_results.np',
+                #'modern_net_replace_bin_scaled_results.np',
+                #'net_predicted_bin_scaled_results.np',
+                'modern_net_predicted_bin_scaled_results.np',
+                #'net_mode_bin_scaled_results.np',
+                # 'modern_net_mode_bin_scaled_results.np',
+                # 'net_facanal_bin_scaled_results.np',
+                'modern_net_facanal_bin_scaled_results.np')
 
 # plot and save results to png
 for result_filename in result_files:
