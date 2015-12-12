@@ -1,4 +1,5 @@
 import numpy as np
+import cPickle as pickle
 from scipy.stats import mode
 from sklearn.preprocessing import StandardScaler
 from missing_data_imputation import Imputer
@@ -43,6 +44,7 @@ np.savetxt("../adult-dataset/data_drop.csv", data_drop, delimiter=",", fmt="%s")
 data_drop_bin = imp.binarize_data(data_drop, cat_cols).astype(float)
 data_drop_bin.dump('../adult-dataset/data_drop_bin.np')
 scaler = StandardScaler().fit(data_drop_bin)
+pickle.dump(scaler, open('scaler_drop.pkl', 'wb'))
 data_drop_bin_scaled = scaler.transform(data_drop_bin)
 data_drop_bin_scaled.dump('../adult-dataset/data_drop_bin_scaled.np')
 del data_drop
@@ -57,6 +59,7 @@ np.savetxt("../adult-dataset/data_replace.csv", data_replace, delimiter=",", fmt
 data_replace_bin = imp.binarize_data(data_replace, cat_cols).astype(float)
 data_replace_bin.dump('../adult-dataset/data_replace_bin.np')
 scaler = StandardScaler().fit(data_replace_bin)
+pickle.dump(scaler, open('scaler_replace.pkl', 'wb'))
 data_replace_bin_scaled = scaler.transform(data_replace_bin)
 data_replace_bin_scaled.dump('../adult-dataset/data_replace_bin_scaled.np')
 del data_replace
@@ -71,6 +74,7 @@ np.savetxt("../adult-dataset/data_mode.csv", data_mode, delimiter=",", fmt="%s")
 data_mode_bin = imp.binarize_data(data_mode, cat_cols).astype(float)
 data_mode_bin.dump('../adult-dataset/data_mode_bin.np')
 scaler = StandardScaler().fit(data_mode_bin)
+pickle.dump(scaler, open('scaler_mode.pkl', 'wb'))
 data_mode_bin_scaled = scaler.transform(data_mode_bin)
 data_mode_bin_scaled.dump('../adult-dataset/data_mode_bin_scaled.np')
 del data_mode
@@ -96,6 +100,7 @@ np.savetxt("../adult-dataset/data_predicted.csv", data_predicted, delimiter=",",
 data_predicted_bin = imp.binarize_data(data_predicted, cat_cols).astype(float)
 data_predicted_bin.dump('../adult-dataset/data_predicted_bin.np')
 scaler = StandardScaler().fit(data_predicted_bin)
+pickle.dump(scaler, open('scaler_predicted.pkl', 'wb'))
 data_predicted_bin_scaled = scaler.transform(data_predicted_bin)
 data_predicted_bin_scaled.dump('../adult-dataset/data_predicted_bin_scaled.np')
 del data_predicted
@@ -117,9 +122,9 @@ del data_facanal_bin
 del data_facanal_bin_scaled
 
 # replace missing data with knn
-#data_knn = imp.knn(x, n_neighbors, np.mean, missing_data_cond)
-#data_knn_bin = imp.binarize_data(data_knn, cat_cols).astype(float)
-#data_knn_bin.dump('../adult-dataset/data_knn_bin.np')
-#scaler = StandardScaler().fit(data_knn_bin)
-#data_knn_bin_scaled = scaler.transform(data_knn_bin)
-#data_knn_bin_scaled.dump('../adult-dataset/data_knn_bin_scaled.np')
+data_knn = imp.knn(x, n_neighbors, np.mean, missing_data_cond, cat_cols)
+data_knn_bin = imp.binarize_data(data_knn, cat_cols).astype(float)
+data_knn_bin.dump('../adult-dataset/data_knn_bin.np')
+scaler = StandardScaler().fit(data_knn_bin)
+data_knn_bin_scaled = scaler.transform(data_knn_bin)
+data_knn_bin_scaled.dump('../adult-dataset/data_knn_bin_scaled.np')

@@ -86,7 +86,6 @@ for param_idx in xrange(params_matrix.shape[0]):
 
     cost = T.mean(T.nnet.categorical_crossentropy(py_x, Y))
     params = [w_h, w_o]
-
     updates = sgd(cost, params, gamma=gamma)
 
     train = theano.function(inputs=[X, Y],

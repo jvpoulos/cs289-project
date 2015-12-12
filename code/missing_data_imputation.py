@@ -94,8 +94,7 @@ class Imputer(object):
         return data
 
 
-
-    def knn(self, x, k, summary_func, missing_data_cond, cols_cat = (1,3,4,5,6),
+    def knn(self, x, k, summary_func, missing_data_cond, cols_cat,
             in_place=False):
         """ Replace missing values with the mean or median of knn
 
@@ -127,15 +126,8 @@ class Imputer(object):
         # first transform features with categorical missing data into one hot
         data_complete = imp.one_hot(data, missing_data_cond)
 
-        col_factors_labels = {}
-        # replace categorical data with one hot rows
-        for col_cat in cols_cat:
-            factors, labels = pd.factorize(data_complete[:,col_cat])
-            data_complete[:,col_cat] = factors
-            col_factors_labels[col_cat] = (factors, labels)
-
-        # convert data to int
-        data_complete = data_complete.astype(int)
+        # binarize categorical variables, hard coded for now
+        data_complete = imp.binarize_data(data_complete, (2,3,4,5,6))
 
         # get indices of observations with nan
         miss_rows, miss_cols = np.where(missing_data_cond(data))
@@ -235,7 +227,8 @@ class Imputer(object):
         return data
 
 
-    def factor_analysis(self, x, cat_cols, missing_data_cond, threshold=0.9, in_place = False):
+    def factor_analysis(self, x, cat_cols, missing_data_cond, threshold=0.9,
+                        in_place = False):
         """ Performs principal component analyze and replaces missing data with
         values obtained from the data procolected onto n principal components
 
@@ -312,6 +305,7 @@ class Imputer(object):
             data[:,col] = factors
 
         return data, factor_labels
+
 
     def binarize_data(self, x, cols, one_minus_one=True, in_place=False):
         """Replace column in cols with one-hot representation of cols
