@@ -70,7 +70,7 @@ below ~\cite{batista2003analysis}:
 \begin{description}
 \item[Case substitution] One observation with missing data is replaced with
 another non-sampled observation.
-\item[Distributions] Replace the missing data with the mean, median, or mode of
+\item[Summary statistic] Replace the missing data with the mean, median, or mode of
     the feature vector. Using a numerical approach directly is not appropriate for nonordinal categorical data.
 \item[One-hot] Create a binary variable to indicate whether or not a specific
     feature is missing. %This technique was suggested by Isabelle Guyon.
@@ -164,8 +164,29 @@ Figure \ref{fig:barplot-missing} shows the frequency of observed categories and 
 
 \subsection{Preprocessing}
 
+We preprocess the training and test data as follows:
+
+\begin{enumerate}
+\item Drop the string feature \texttt{education} because it contains identical information as its numeric counterpart \texttt{education.num}.
+\item Binarize the categorical variables.
+\item Implement imputation technique. When replacing the missing data with the mean, median, or mode of
+    the feature vector, the summary statistic is computed from the training data, not from the test data.
+\item Standardize each feature to midrange 0 and range 2 (i.e., minimum -1 and maximum 1). We use the training set values for range and midrange to standardize test set features.
+\end{enumerate}
 
 \subsection{Model selection}
+
+We implement two neural network classifiers: a simple model and a complex model. The complex model uses two hidden layers, both with the same size of hidden notes, which is computed using the formula, and root-mean-square gradient scaling for the update rule. The simple model uses one hidden layer and stochastic gradient descent for the update rule. Both models use a cross--entropy cost function and weights initialized randomly using Gaussian distribution and scaled by a factor of $10^{-2}$. 
+
+formula 
+
+grid search 
+
+k-fold cv
+
+Table \ref{tab:err-rates}
+
+Figure \ref{fig:barplot-missing}
 
 \begin{table*}[htbp]
 \begin{center}
@@ -194,8 +215,8 @@ Median & Complex & 1 & 0.01 & 32 & 0.1595 & 0.3564 & - \\
 
 \begin{figure*}[htbp] 
    \centering
-   \includegraphics[width=0.8\textwidth]{./figure/drop-2d.png}
-   \caption{Performance of simple neural network on training data with missing values dropped: 3-fold cross--validated error rate versus $\alpha$ (x--axis) and $\gamma$ (colors). See Table \ref{tab:err-rates} for definitions.}
+   \includegraphics[width=0.8\textwidth]{./figure/predicted-simple-2d.png}
+   \caption{Performance of simple neural network on training data with missing values imputed using random forests: 3-fold cross--validated error rate versus $\alpha$ (x--axis) and $\gamma$ (colors). See Table \ref{tab:err-rates} for definitions.}
    \label{fig:barplot-missing}
 \end{figure*}
 
