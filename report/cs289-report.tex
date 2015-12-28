@@ -60,7 +60,7 @@ techniques for data imputation (i.e., replace missing values with plausible ones
 direct estimation (i.e., all missing data is analyzed using a maximum likelihood
 approach) have been proposed ~\cite{de2003prevention}. \\
 
-Random Forestsand other ensembles of decision trees are the method of choice for survey data, largely because missing data and categorical variables are not easy to handle with neural networks. We investigate techniques for handling missing data and
+Random Forests and other ensembles of decision trees are the method of choice for survey data, largely because missing data and categorical variables are not easy to handle with neural networks. We investigate techniques for handling missing data and
 encoding categorical data such that it is appropriate to neural network classifiers. We compare six different imputation strategies:  case substitution; mean or median imputation; one--hot; hot deck and cold deck; prediction model; and factor analysis. These strategies are defined in Section \ref{section:techniques}. \\
 
 After briefly reviewing related works in Section~\ref{section:rw}, we experiment using neural networks on benchmark data and compare our results with the state-of-the-art in Section~\ref{section:experiments}. Finally, we draw conclusions in Section~\ref{section:Con}.
@@ -68,7 +68,7 @@ After briefly reviewing related works in Section~\ref{section:rw}, we experiment
 \section{Related work}  \label{section:rw}
 
 \subsection{Techniques for handling missing data} \label{section:techniques}
-We divide proposed  imputation methods into six groups listed
+We categorize proposed  imputation methods into six groups listed
 below ~\cite{batista2003analysis}:
 
 \begin{description}
@@ -101,7 +101,7 @@ More elaborate techniques include information theoretic measures
 ~\cite{wang2008categorical}, training separate output units for
 each of the allowed combination of values of the categorical independent
 variables ~\cite{brouwer2002feed}, and using distance
-hierarchies ~\cite{hsu2006generalizing}.
+hierarchies ~\cite{hsu2006generalizing}. \\
 
 In the case of categorical variables, which by definition have no direct
 representation or computation scheme of the distance between its values,
@@ -110,7 +110,7 @@ However, their training process is slow given a large enough dataset and they
 might not be suitable for problems where the decision boundary between classes
 described by a second-order polynomial,\footnote{We note, however, that a
 property test can be as complex as the data at hand.} for
-example ~\cite{fayyad1996data}. \\
+example ~\cite{fayyad1996data}.
 
 \section{Experiments} \label{section:experiments}
 
@@ -183,7 +183,7 @@ We preprocess the training and test data as follows:
 
 We implement two neural network classifiers: a simple model and a complex model. The complex model uses two hidden layers, both with the same size of hidden nodes, which is computed using the formula $N_h = \frac{N_s}{(\alpha * (N_i + N_o)}$, where the number of hidden nodes $N_h$ is a function of the number of training examples $N_s$, a scaling parameter $\alpha$, the number of input neurons $N_i$, and the number of output neurons $N_s$. The complex model uses root-mean-square gradient scaling for the update rule, while the simple model uses one hidden layer and stochastic gradient descent for the update rule. Both models use a cross--entropy cost function and weights initialized randomly using Gaussian distribution and scaled by a factor of $10^{-2}$. 
 
-We use two layers of cross--validation for selecting model parameters: grid search $K$--fold cross validation. We perform an exhaustive search on a grid of parameter values composed of $\alpha = \{1,4,9\}$ learning rate $\gamma = \{10^{-1}, 10^{-2}, 10^{-3}\}$, and $\mathrm{mini-batch\, size} = \{32, 512, 4096\}$. For each $3!*3 = 18$ parameter combinations, we perform $K$--fold cross--validation on $k=3$ folds. We evaluate the models based on the average error rate across folds and also record average cost and average computing time across folds.  
+We use two layers of cross--validation for selecting model parameters: grid search and $K$--fold cross validation. We perform an exhaustive search on a grid of parameter values composed of $\alpha = \{1,4,9\}$ learning rate $\gamma = \{10^{-1}, 10^{-2}, 10^{-3}\}$, and $\mathrm{mini-batch\, size} = \{32, 512, 4096\}$. For each $3!*3 = 18$ parameter combinations, we perform $K$--fold cross--validation on $k=3$ folds. We evaluate the models based on the average error rate across folds and also record average cost and average computing time across folds.  
 
 We train both simple and complex classifiers on data with missing values imputed using most of the techniques described in Section \ref{section:techniques} and on data with instances with missing values removed. Figure \ref{fig:predicted-simple-2d} provides a visual example of the results of the simple neural network on training data with missing values imputed using random forests. Table \ref{tab:err-rates} reports the models with the lowest cross--validated error rate. The simple neural network outperforms the complex classifier in most cases. We find that omitting instances with missing values yields a lower error rate on the training data than all of the imputation methods. The difference between imputation methods in terms of accuracy is minimal. 
 
@@ -210,7 +210,7 @@ Summary statistic  (median) & Complex & 1 & 0.01 & 32 & 0.1595 & 0.3564 & - \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Performance of models selected on the basis of cross--validated error rate on the training data. \texttt{Imputation method}is how missing values in the training data are imputed; \texttt{Model type} is the type of neural network classifier used; \texttt{$\alpha$} is the scaling factor used to determine the number of hidden neurons in the neural network; \texttt{$\gamma$} is the learning rate; \texttt{Batch size} is the size of the batch; \texttt{Error rate} is the mean 3-fold cross--validated error rate on the training data;  \texttt{Cost} is the mean cross--entropy cost across folds; \texttt{Time} is the mean training time across folds. }
+\caption{Performance of models selected on the basis of cross--validated error rate on the training data. \texttt{Imputation method} is how missing values in the training data are imputed; \texttt{Model type} is the type of neural network classifier used; \texttt{$\alpha$} is the scaling factor used to determine the number of hidden neurons in the neural network; \texttt{$\gamma$} is the learning rate; \texttt{Batch size} is the size of the batch; \texttt{Error rate} is the mean 3-fold cross--validated error rate on the training data;  \texttt{Cost} is the mean cross--entropy cost across folds; \texttt{Time} is the mean training time across folds. }
 \label{tab:err-rates}
 \end{table*}
 
@@ -232,8 +232,9 @@ Neural networks have become a popular machine learning algorithm in many domains
 
 We use the Adult dataset for benchmarking because it has a mixture of continuous and categorical variables and has under 10\% of the instances containing missing values. Removing instances with missing values instead of imputing the missing values actually yields the highest cross--validated accuracy on the training set. This finding suggest that the instances with missing values or the features that contain missing values (i.e., \textit{occupation}, \textit{work class}, and \textit{native country}) do not contribute meaningful information for the prediction task. Another interpretation is that there is not enough missing values in the training data for imputation to make a difference.
 
-However, we find that two of the imputation methods --- prediction using random forests and replacing the missing values with column modes --- both yield higher test set accuracy than no imputation. Our best test set accuracy is within 3\% of the state--of--the--art, which uses Naive Bayes and removes data with missing values. 
+However, we find that two of the imputation methods --- prediction using random forests and replacing the missing values with column modes --- both yield lower generalization error than no imputation. Our lowest test error is within 3\% of the state--of--the--art, which uses Naive Bayes and removes data with missing values. 
 
+For future work, we will explore the relevance of the features with missing data and the amount of missing data for this particular prediction task. 
 %\section*{Acknowledgments}
 
 {\small
