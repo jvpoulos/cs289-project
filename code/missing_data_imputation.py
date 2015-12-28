@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial.distance import pdist, squareform
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from scipy.sparse.linalg import svds
@@ -95,7 +96,7 @@ class Imputer(object):
 
 
     def knn(self, x, k, summary_func, missing_data_cond, cols_cat,
-            in_place=False):
+            in_place=False, verbose=False):
         """ Replace missing values with the mean or median of knn
 
         Parameters
@@ -105,16 +106,26 @@ class Imputer(object):
 
         """
 
-        def row_col_from_condensed_idx(n_obs, i):
+        def row_col_from_condensed_idx(n_obs, row):
             b = 1 -2 * n_obs
-            x = np.floor((-b - np.sqrt(b**2 - 8*i))/2)
-            y = i + x*(b + x + 2)/2 + 1
+            x = np.floor((-b - np.sqrt(b**2 - 8*row))/2).astype(int)
+            y = row + x*(b + x + 2)/2 + 1
             return (x, y)
 
 
         def condensed_idx_from_row_col(row, col, n_rows):
-            return row*n_rows + col - row*(row+1)/2 - row - 1
+            if row > col:
+                row, col = col, row
 
+            return row*n_rows + col - row*(row+1)/2 - row - 1
+            """
+            if row > col:
+                # lower triangle
+                return col*n_rows - col*(col+1)/2 + row - 1 - col
+            else:
+                # upper triangle
+                return row*n_rows + col - row*(row+1)/2 - row - 1
+            """
 
         if in_place:
             data = x
@@ -126,38 +137,49 @@ class Imputer(object):
         # first transform features with categorical missing data into one hot
         data_complete = imp.one_hot(data, missing_data_cond)
 
-        # binarize categorical variables, hard coded for now
-        data_complete = imp.binarize_data(data_complete, (2,3,4,5,6))
+        # binarize categorical variables and convert to int, hard coded for now
+        data_complete = imp.binarize_data(data_complete, (2,3,4,5,6)).astype(float)
+
+        # normalize features! or not?
+        scaler = StandardScaler().fit(data_complete)
+        data_complete = scaler.transform(data_complete)
 
         # get indices of observations with nan
-        miss_rows, miss_cols = np.where(missing_data_cond(data))
+        miss_rows = np.unique(np.where(missing_data_cond(data))[0])
         n_obs = data_complete.shape[0]
 
         # compute distance matrix with nan values set to 0.0
         print 'Computing distance matrix'
-        dist_mat = pdist(data_complete, metric='euclidean')
+        dist_cond = pdist(data_complete, metric='euclidean')
 
         print 'Substituting missing values'
-
-        # substitute missing values with median of knn
+        # substitute missing values with mode of knn
         # this code must be optimized for speed!!!
         for j in xrange(len(miss_rows)):
-            print 'Substituting {}-th of {} total'.format(j, len(miss_rows))
             miss_row_idx = miss_rows[j]
+
             # get indices of distances in condensed form
             ids_cond = [condensed_idx_from_row_col(miss_row_idx, idx, n_obs)
-                        for idx in xrange(n_obs) if idx not in miss_rows]
+                         for idx in xrange(n_obs) if idx not in miss_rows]
             ids_cond = np.array(ids_cond, dtype=int)
 
             # compute k-nearest neighbors
-            knn_indices_cond = ids_cond[np.argsort(dist_mat[ids_cond])[:k]]
-            _, knn_indices = row_col_from_condensed_idx(n_obs, knn_indices_cond)
+            knn_ids_cond = ids_cond[np.argsort(dist_cond[ids_cond])[:k]]
+            rows, cols = row_col_from_condensed_idx(n_obs, knn_ids_cond)
+
+            # swap if necessary
+            good_obs_ids = np.array([i for i in cols if i != miss_row_idx] +
+                                    [j for j in rows if j != miss_row_idx],
+                                    dtype=int)
 
             # cols with missing data
             obs_nan_cols = np.where(missing_data_cond(x[miss_row_idx]))[0]
 
-            knn_mean_vals, _ = mode(x[:,obs_nan_cols][knn_indices.astype(int)])
-
+            # get feature mode value given knn
+            knn_mean_vals, _ = mode(data[:,obs_nan_cols][good_obs_ids])
+            if verbose:
+                print 'Substituting {}-th of {} total \n Value {}'.format(j,
+                    len(miss_rows), knn_mean_vals)
             data[miss_row_idx, obs_nan_cols] = knn_mean_vals.flatten()
         return data
 
